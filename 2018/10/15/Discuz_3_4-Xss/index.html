@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Discuz v3.4 排行页面存储型XSS漏洞分析 | j2ekim&#39;s Blog | 努力改变，从未放弃。</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Web Security">
+    <meta name="description" content="2018年10月12日，Discuz官方修复了一处XSS漏洞：     简要分析source/module/misc/misc_ranklist.php:166 123456789101112&amp;lt;?php function getranklist_members($offset = 0, $limit = 20) &amp;#123;	require_once libfile(&apos;function/fo">
+<meta name="keywords" content="Web Security">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Discuz v3.4 排行页面存储型XSS漏洞分析">
+<meta property="og:url" content="https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/index.html">
+<meta property="og:site_name" content="j2ekim&#39;s Blog">
+<meta property="og:description" content="2018年10月12日，Discuz官方修复了一处XSS漏洞：     简要分析source/module/misc/misc_ranklist.php:166 123456789101112&amp;lt;?php function getranklist_members($offset = 0, $limit = 20) &amp;#123;	require_once libfile(&apos;function/fo">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015113653-8ee3cbd6-d02b-1.jpeg">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015113702-949732ac-d02b-1.jpeg">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015142359-e6cc8c86-d042-1.gif">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg">
+<meta property="og:updated_time" content="2019-07-22T06:47:00.044Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Discuz v3.4 排行页面存储型XSS漏洞分析">
+<meta name="twitter:description" content="2018年10月12日，Discuz官方修复了一处XSS漏洞：     简要分析source/module/misc/misc_ranklist.php:166 123456789101112&amp;lt;?php function getranklist_members($offset = 0, $limit = 20) &amp;#123;	require_once libfile(&apos;function/fo">
+<meta name="twitter:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015113653-8ee3cbd6-d02b-1.jpeg">
+    
+        <link rel="alternate" type="application/atom+xml" title="j2ekim&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/Avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">J2ekim</h5>
+          <a href="mailto:j2ekim@gmail.com" title="j2ekim@gmail.com" class="mail">j2ekim@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/j2ekim" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Discuz v3.4 排行页面存储型XSS漏洞分析</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Discuz v3.4 排行页面存储型XSS漏洞分析</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-10-15T05:43:19.000Z" itemprop="datePublished" class="page-time">
+  2018-10-15
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/">Web安全</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/Exploit/">Exploit</a></li></ul></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#简要分析"><span class="post-toc-number">1.</span> <span class="post-toc-text">简要分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#漏洞复现"><span class="post-toc-number">2.</span> <span class="post-toc-text">漏洞复现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#修复方案"><span class="post-toc-number">3.</span> <span class="post-toc-text">修复方案</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Discuz_3_4-Xss"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Discuz v3.4 排行页面存储型XSS漏洞分析</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-10-15 13:43:19" datetime="2018-10-15T05:43:19.000Z"  itemprop="datePublished">2018-10-15</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/">Web安全</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/Exploit/">Exploit</a></li></ul></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>2018年10月12日，Discuz官方修复了一处XSS漏洞：<br>    <img src="https://xzfile.aliyuncs.com/media/upload/picture/20181015113653-8ee3cbd6-d02b-1.jpeg"></p>
+<h2 id="简要分析"><a href="#简要分析" class="headerlink" title="简要分析"></a>简要分析</h2><p>source/module/misc/misc_ranklist.php:166</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getranklist_members</span><span class="params">($offset = <span class="number">0</span>, $limit = <span class="number">20</span>)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">require_once</span> libfile(<span class="string">'function/forum'</span>);</span><br><span class="line">	$members = <span class="keyword">array</span>();</span><br><span class="line">	$topusers = C::t(<span class="string">'home_show'</span>)-&gt;fetch_all_by_unitprice($offset, $limit, <span class="keyword">true</span>);</span><br><span class="line">	<span class="keyword">foreach</span>($topusers <span class="keyword">as</span> $member) &#123;</span><br><span class="line">		$member[<span class="string">'avatar'</span>] = avatar($member[<span class="string">'uid'</span>], <span class="string">'small'</span>);</span><br><span class="line">		$member[<span class="string">'note'</span>] = dhtmlspecialchars($member[<span class="string">'note'</span>]);</span><br><span class="line">		$members[] = $member;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> $members;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Dz在此处获取到    $member[‘note’]     后调用了dhtmlspecialchars进行过滤，在source/function/function_core.php:203 会对’&amp;’, ‘“‘, ‘&lt;’, ‘&gt;’进行实体编码。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">dhtmlspecialchars</span><span class="params">($string, $flags = null)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(is_array($string)) &#123;</span><br><span class="line">			。。。</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="keyword">if</span>($flags === <span class="keyword">null</span>) &#123;</span><br><span class="line">				$string = str_replace(<span class="keyword">array</span>(<span class="string">'&amp;'</span>, <span class="string">'"'</span>, <span class="string">'&lt;'</span>, <span class="string">'&gt;'</span>), <span class="keyword">array</span>(<span class="string">'&amp;amp;'</span>, <span class="string">'&amp;quot;'</span>, <span class="string">'&amp;lt;'</span>, <span class="string">'&amp;gt;'</span>), $string);</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				。。。</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> $string;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>从getranklist_members返回后 source/include/misc/misc_ranklist_index.php:113</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">。。。</span><br><span class="line"><span class="keyword">if</span>($ranklist_setting[<span class="string">'member'</span>][<span class="string">'available'</span>]) &#123;</span><br><span class="line">	$memberlist = getranklist_members(<span class="number">0</span>, <span class="number">27</span>);</span><br><span class="line">&#125;</span><br><span class="line">。。。</span><br><span class="line"><span class="keyword">include</span> template(<span class="string">'diy:ranklist/ranklist'</span>);</span><br></pre></td></tr></table></figure>
+<p>进行模板的渲染在 data/template/1_diy_ranklist_ranklist.tpl.php:32<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">if</span>($memberlist) &#123; <span class="meta">?&gt;</span></span><br><span class="line">&lt;a href="home.php?mod=space&amp;amp;uid=&lt;?php echo $memberlist['0']['uid'];?&gt;&amp;amp;do=profile" target="_blank" id="bid_&lt;?php echo $memberlist['0']['uid'];?&gt;" class="hm" &lt;?php if($memberlist['0']['note']) &#123; ?&gt; onmouseover="showTip(trhis)" tip="&lt;?php echo $memberlist['0']['username'];?&gt;: &lt;?php echo $memberlist['0']['note'];?&gt;"&lt;?php &#125; ?&gt;&gt;&lt;?php echo avatar($memberlist[0][uid],middle);?&gt;&lt;/a&gt;</span><br><span class="line"><span class="meta">&lt;?php</span> &#125; <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到在tip属性中输出了$memberlist[‘0’][‘note’]。在之前有一个onmouseover事件，跟入showTip(trhis) 在 static/js/common.js:1062<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showTip</span><span class="params">(ctrlobj)</span> </span>&#123;</span><br><span class="line">	$F(<span class="string">'_showTip'</span>, arguments);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>跟入_showTip，在 static/js/common_extra.js:912<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_showTip</span><span class="params">(ctrlobj)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(!ctrlobj.id) &#123;</span><br><span class="line">		ctrlobj.id = <span class="string">'tip_'</span> + Math.random();</span><br><span class="line">	&#125;</span><br><span class="line">	menuid = ctrlobj.id + <span class="string">'_menu'</span>;</span><br><span class="line">	<span class="keyword">if</span>(!$(menuid)) &#123;</span><br><span class="line">		<span class="keyword">var</span> div = document.createElement(<span class="string">'div'</span>);</span><br><span class="line">		div.id = ctrlobj.id + <span class="string">'_menu'</span>;</span><br><span class="line">		div.className = <span class="string">'tip tip_4'</span>;</span><br><span class="line">		div.style.display = <span class="string">'none'</span>;</span><br><span class="line">		div.innerHTML = <span class="string">'&lt;div class="tip_horn"&gt;&lt;/div&gt;&lt;div class="tip_c"&gt;'</span> + ctrlobj.getAttribute(<span class="string">'tip'</span>) + <span class="string">'&lt;/div&gt;'</span>;</span><br><span class="line">		$(<span class="string">'append_parent'</span>).appendChild(div);</span><br><span class="line">	&#125;</span><br><span class="line">	$(ctrlobj.id).onmouseout = <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>&#123; hideMenu(<span class="string">''</span>, <span class="string">'prompt'</span>); &#125;;</span><br><span class="line">	showMenu(&#123;<span class="string">'mtype'</span>:<span class="string">'prompt'</span>,<span class="string">'ctrlid'</span>:ctrlobj.id,<span class="string">'pos'</span>:<span class="string">'12!'</span>,<span class="string">'duration'</span>:<span class="number">2</span>,<span class="string">'zindex'</span>:JSMENU[<span class="string">'zIndex'</span>][<span class="string">'prompt'</span>]&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过ctrlobj.getAttribute(‘tip’)获取tip属性的值，由于getAttribute获取的内容会自动反转义，即前面在dhtmlspecialchars编码过的内容又被解码了一次。此后拼接到div标签的innerHTML中，最后输出到页面上造成了xss</p>
+<p>关于getAttribute，可以用下面代码测试：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">name</span>=<span class="string">"&amp;lt;a&amp;gt;"</span> <span class="attr">id</span>=<span class="string">"div"</span>&gt;</span>test<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">div1 = document.getElementById("div");</span></span><br><span class="line"><span class="undefined">align = div1.getAttribute("name");</span></span><br><span class="line"><span class="undefined">alert(align); </span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p>该CMS中，排行榜功能是默认开启的。在地址 <a href="http://127.0.0.1/misc.php?mod=ranklist&amp;type=member" target="_blank" rel="noopener">http://127.0.0.1/misc.php?mod=ranklist&amp;type=member</a> 的上榜宣言中输入payload（拒绝伸手党）<br><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181015113702-949732ac-d02b-1.jpeg"></p>
+<p>在 <a href="http://127.0.0.1/misc.php?mod=ranklist" target="_blank" rel="noopener">http://127.0.0.1/misc.php?mod=ranklist</a> 当鼠标移动到头像上触发onmouseover事件，执行xss<br><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181015142359-e6cc8c86-d042-1.gif"></p>
+<h2 id="修复方案"><a href="#修复方案" class="headerlink" title="修复方案"></a>修复方案</h2><p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg"></p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg" target="_blank" rel="noopener">https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-07-22T06:47:00.044Z" itemprop="dateUpdated">2019-07-22 14:47:00</time>
+</span><br>
+
+
+        
+        转载注明来自<a href="/2018/10/15/Discuz_3_4-Xss/" target="_blank" rel="external">https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://j2ekim.github.io">
+            <img src="/img/Avatar.jpg" alt="J2ekim">
+            J2ekim
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web-Security/">Web Security</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/&title=《Discuz v3.4 排行页面存储型XSS漏洞分析》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/&title=《Discuz v3.4 排行页面存储型XSS漏洞分析》 — j2ekim's Blog&source=专注于打杂事业" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Discuz v3.4 排行页面存储型XSS漏洞分析》 — j2ekim's Blog&url=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2018/11/29/phpcms_2008_type_php-getshell/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">phpcms 2008 type.php 前台代码注入getshell漏洞分析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/09/24/Destoon-20180827_getshell/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Destoon-20180827版本前台 Getshell漏洞复现</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>J2ekim &copy; 2017 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/&title=《Discuz v3.4 排行页面存储型XSS漏洞分析》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/&title=《Discuz v3.4 排行页面存储型XSS漏洞分析》 — j2ekim's Blog&source=专注于打杂事业" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Discuz v3.4 排行页面存储型XSS漏洞分析》 — j2ekim's Blog&url=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2018/10/15/Discuz_3_4-Xss/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACK0lEQVR42u3awU7DMBAEUP7/p4vECQlqzaxTRJ2XU0VL4pfDauzdj4/4enxdzz5//8vP37T3efa/F1wYGBhvy3gsr2fLSr7Nl7V+7nptGBgY92G0xXH9v8lrelayk/tjYGBg5NGtfeSanRR6DAwMjNnj13fL4x0GBgbGmpEHuPxh68XlMfHivTgGBsYbMvYbA6/7/Kf9DQwMjH/JeIyuNsy1rcp6PRgYGEcz1gMTeZVrGwA5vijEGBgYhzLykpo/oG1qtuv5ZW0YGBhHM/Iv8qXvLG6rMYCBgXEDRrtNnW1rZ2W6CK8YGBhHM2aYnYW2Tc0iOGJgYNyA0QKSsYlZGE2KPgYGxtmMnWGvnYSWFNNiU42BgXEDxv5S2uKbNCEKHgYGxi0Z+QN2mgo7jc+o4GJgYBzKaIvjVYEyuVtRcDEwMI5jtKVzNh6RHLdtTYhgYGAcymi3ju2RWT4aWzcpMTAwbsNIGpOzLe6sGTkMiBgYGEcz2i1lu/lMeLPNcFSOMTAwDmLMhh6S37dhsT3yu2B2AwMD460YdeMwjn1bgxSzczsMDIzjGHVy3NiOzgLosEmAgYFxBGPnWL89aMtjX13cMTAwjmbsxMd2q9kepc1eEwYGxqmMnSZiGytfFxkxMDDuwGgLXxLm8mO72evGwMDAyI/1rw2Cs9eEgYGB0ca+/OAsj5gYGBgY+ZhXUgT3R822BiwwMDCOY1x1ljULhTnmJS1MDAyM/874BJPDA/HxWZCYAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
