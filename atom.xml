@@ -204,9 +204,9 @@
     
       <category term="PHP" scheme="https://j2ekim.github.io/tags/PHP/"/>
     
-      <category term="Code" scheme="https://j2ekim.github.io/tags/Code/"/>
-    
       <category term="Study" scheme="https://j2ekim.github.io/tags/Study/"/>
+    
+      <category term="Code" scheme="https://j2ekim.github.io/tags/Code/"/>
     
   </entry>
   
@@ -215,7 +215,7 @@
     <link href="https://j2ekim.github.io/2018/02/23/CVE-2017-12615_exploit/"/>
     <id>https://j2ekim.github.io/2018/02/23/CVE-2017-12615_exploit/</id>
     <published>2018-02-22T17:28:16.000Z</published>
-    <updated>2019-07-22T10:54:39.716Z</updated>
+    <updated>2019-07-22T10:56:39.349Z</updated>
     
     <content type="html"><![CDATA[<h2 id="1-漏洞背景"><a href="#1-漏洞背景" class="headerlink" title="1.漏洞背景"></a>1.漏洞背景</h2><p>Tomcat如果开启PUT方法支持则可能存在远程代码执行漏洞，漏洞编号为CVE-2017-12615的漏洞。攻击者可以在使用漏洞上传JSP文件，从而导致远程代码执行。此漏洞影响Windows平台下的Apache Tomcat 7.x版本，目前已经在Apache Tomcat 7.0.81中修复。</p><h2 id="2-环境配置"><a href="#2-环境配置" class="headerlink" title="2.环境配置"></a>2.环境配置</h2><ul><li>Windows 7</li><li>配置jdk环境</li><li>Tomcat ，版本为7.0.55</li><li>burpsuite</li></ul><p>安装tomcat，这里安装的版本为7.0.55<br><img src="/img/cve-2017-12615/tomcat.png"></p><p>修改Tomcat的conf下的web.xml配置文件<br>添加readonly设置为false时的情况(添加以下代码)<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">param-name</span>&gt;</span>readonly<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">param-value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br></pre></td></tr></table></figure></p><h3 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h3><p>打开burpsuite进行抓包，在抓包前修改burp代理的默认端口，设置为8008<br>同样地，在浏览器的代理处也设置为127.0.0.1:8008<br><img src="/img/cve-2017-12615/burp_1.png"></p><p>开启代理后刷新web页面进行抓包<br><img src="/img/cve-2017-12615/burp_2.png"></p><h3 id="改包"><a href="#改包" class="headerlink" title="改包"></a>改包</h3><p>将GET / HTTP/1.1改成 PUT /1.jsp/ HTTP/1.1<br><img src="/img/cve-2017-12615/burp_post-put.png"></p><p>点击forward<br>浏览器回显是201，说明写入成功<br>来到webapps/ROOT目录下可以看到确实写入成功<br><img src="/img/cve-2017-12615/getshell.png"></p>]]></content>
     
