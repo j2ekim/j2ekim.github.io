@@ -32,7 +32,8 @@
 <meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015113702-949732ac-d02b-1.jpeg">
 <meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015142359-e6cc8c86-d042-1.gif">
 <meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg">
-<meta property="og:updated_time" content="2019-07-22T06:47:00.044Z">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg">
+<meta property="og:updated_time" content="2019-07-23T07:30:29.457Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Discuz v3.4 排行页面存储型XSS漏洞分析">
 <meta name="twitter:description" content="2018年10月12日，Discuz官方修复了一处XSS漏洞：     简要分析source/module/misc/misc_ranklist.php:166 123456789101112&amp;lt;?php function getranklist_members($offset = 0, $limit = 20) &amp;#123;	require_once libfile(&apos;function/fo">
@@ -212,7 +213,7 @@
 <h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p>该CMS中，排行榜功能是默认开启的。在地址 <a href="http://127.0.0.1/misc.php?mod=ranklist&amp;type=member" target="_blank" rel="noopener">http://127.0.0.1/misc.php?mod=ranklist&amp;type=member</a> 的上榜宣言中输入payload（拒绝伸手党）<br><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181015113702-949732ac-d02b-1.jpeg"></p>
 <p>在 <a href="http://127.0.0.1/misc.php?mod=ranklist" target="_blank" rel="noopener">http://127.0.0.1/misc.php?mod=ranklist</a> 当鼠标移动到头像上触发onmouseover事件，执行xss<br><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181015142359-e6cc8c86-d042-1.gif"></p>
 <h2 id="修复方案"><a href="#修复方案" class="headerlink" title="修复方案"></a>修复方案</h2><p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg"></p>
-<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg" target="_blank" rel="noopener">https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg</a></p>
+<p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181015113709-9884e8be-d02b-1.jpeg"></p>
 
         </div>
 
@@ -221,7 +222,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-07-22T06:47:00.044Z" itemprop="dateUpdated">2019-07-22 14:47:00</time>
+    最后更新时间：<time datetime="2019-07-23T07:30:29.457Z" itemprop="dateUpdated">2019-07-23 15:30:29</time>
 </span><br>
 
 

