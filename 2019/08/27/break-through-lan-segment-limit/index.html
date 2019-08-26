@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>突破内网渗透中的访问策略限制 | j2ekim&#39;s Blog | 努力改变，从未放弃。</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="渗透测试">
+    <meta name="description" content="在内网做渗透测试时，常常遇到访问策略限制，无法直接访问渗透目标。本文算是记录下我上一年的几个解决方案。">
+<meta name="keywords" content="渗透测试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="突破内网渗透中的访问策略限制">
+<meta property="og:url" content="https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/index.html">
+<meta property="og:site_name" content="j2ekim&#39;s Blog">
+<meta property="og:description" content="在内网做渗透测试时，常常遇到访问策略限制，无法直接访问渗透目标。本文算是记录下我上一年的几个解决方案。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://j2ekim.github.io/img/break-through-lan-segment-limit/network.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/break-through-lan-segment-limit/add-socks5-server.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/break-through-lan-segment-limit/add-proxy-rules.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/break-through-lan-segment-limit/install-setting.png">
+<meta property="og:image" content="https://j2ekim.github.io/img/break-through-lan-segment-limit/shared-network-card.png">
+<meta property="og:updated_time" content="2019-08-26T17:43:31.491Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="突破内网渗透中的访问策略限制">
+<meta name="twitter:description" content="在内网做渗透测试时，常常遇到访问策略限制，无法直接访问渗透目标。本文算是记录下我上一年的几个解决方案。">
+<meta name="twitter:image" content="https://j2ekim.github.io/img/break-through-lan-segment-limit/network.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="j2ekim&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/Avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">J2ekim</h5>
+          <a href="mailto:j2ekim@gmail.com" title="j2ekim@gmail.com" class="mail">j2ekim@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/j2ekim" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">突破内网渗透中的访问策略限制</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">突破内网渗透中的访问策略限制</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-08-26T17:43:30.000Z" itemprop="datePublished" class="page-time">
+  2019-08-27
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/渗透测试/">渗透测试</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#场景说明"><span class="post-toc-number">1.</span> <span class="post-toc-text">场景说明</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#方案一-HTTP代理"><span class="post-toc-number">2.</span> <span class="post-toc-text">方案一: HTTP代理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-1-跳板服务器配置"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">2.1 跳板服务器配置</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-2-笔记本配置"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2.2 笔记本配置</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-3-方案缺点"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">2.3 方案缺点</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#方案二：Shadowsocks"><span class="post-toc-number">3.</span> <span class="post-toc-text">方案二：Shadowsocks</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-1-跳板服务器配置"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">3.1 跳板服务器配置</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-2-笔记本配置"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">3.2 笔记本配置</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-3-方案缺点"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">4.3 方案缺点</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#方案四：VPN"><span class="post-toc-number">4.</span> <span class="post-toc-text">方案四：VPN</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5-1下载安装"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">5.1下载安装</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5-2-系统设置"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">5.2 系统设置</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5-3-生成VPN证书"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">5.3 生成VPN证书</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5-4-编写服务端和客户端连接配置文件"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">5.4 编写服务端和客户端连接配置文件</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5-5-方案缺点"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">5.5 方案缺点</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">5.</span> <span class="post-toc-text">总结</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考文章"><span class="post-toc-number">6.</span> <span class="post-toc-text">参考文章</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-break-through-lan-segment-limit"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">突破内网渗透中的访问策略限制</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-08-27 01:43:30" datetime="2019-08-26T17:43:30.000Z"  itemprop="datePublished">2019-08-27</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/渗透测试/">渗透测试</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>在内网做渗透测试时，常常遇到访问策略限制，无法直接访问渗透目标。本文算是记录下我上一年的几个解决方案。<br><a id="more"></a></p>
+<h2 id="场景说明"><a href="#场景说明" class="headerlink" title="场景说明"></a>场景说明</h2><p>在做安服驻场时，连入客户内网对另一网段的站点进行渗透。有可能会遇到这种情况，虽然连入了客户内网，但无法直接访问目标站点。因为客户内网做了访问策略限制，不同网段无法直接<br>连通。往往需要通过客户提供的跳板服务器去访问，大概的网络示意图如下：<br><img src="/img/break-through-lan-segment-limit/network.png" alt="网络配置图"><br>我们当然可以在跳板服务器上装好java环境，方便运行比配的Burp Suite。安装python环境，运行常用的渗透辅助脚本。同时如果你还需要其他工具，得一个一个复制到服务器上……这将非常的繁琐！</p>
+<p>那不能通过某种方法可以使得我们的笔记本直接访问的目标站点呢？，这样就不用拷贝工具到服务器上了，毕竟还是自己的笔记本渗透舒适。本文就是用于解决这个问题。</p>
+<h2 id="方案一-HTTP代理"><a href="#方案一-HTTP代理" class="headerlink" title="方案一: HTTP代理"></a>方案一: HTTP代理</h2><h3 id="2-1-跳板服务器配置"><a href="#2-1-跳板服务器配置" class="headerlink" title="2.1 跳板服务器配置"></a>2.1 跳板服务器配置</h3><p>在跳板服务器上搭建Http(s)代理服务器，由于比较简单，就不具体说明如何搭建了。</p>
+<h3 id="2-2-笔记本配置"><a href="#2-2-笔记本配置" class="headerlink" title="2.2 笔记本配置"></a>2.2 笔记本配置</h3><p>在客户端的浏览器上配置好代理，即可访问目标站点了。</p>
+<h3 id="2-3-方案缺点"><a href="#2-3-方案缺点" class="headerlink" title="2.3 方案缺点"></a>2.3 方案缺点</h3><p>只能支持Http协议数据的转发，无法代理其他协议。导致我们无法测试目标站点的其他端口。下个方案我们来解决这个问题。</p>
+<h2 id="方案二：Shadowsocks"><a href="#方案二：Shadowsocks" class="headerlink" title="方案二：Shadowsocks"></a>方案二：Shadowsocks</h2><p>我们往往都是使用Shadowsocks来FQ，其实这种场景也是可以利用Shadowsocks来解决的。</p>
+<h3 id="3-1-跳板服务器配置"><a href="#3-1-跳板服务器配置" class="headerlink" title="3.1 跳板服务器配置"></a>3.1 跳板服务器配置</h3><p>Shadowsocks有python版，nodejs版，go版和exe版。由于我们得到的跳板机一般为Windows，故这里选择绿色单exe版Shadowsocks,方便携带移动。下载地址如下：</p>
+<p><a href="https://github.com/shadowsocks/libQtShadowsocks" target="_blank" rel="noopener">https://github.com/shadowsocks/libQtShadowsocks</a></p>
+<p>新建以下两个文件，内容分别如下：<br>shadowsock.json<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">"server"</span>:<span class="string">"0.0.0.0"</span>,</span><br><span class="line"><span class="attr">"server_port"</span>:<span class="number">8388</span>,</span><br><span class="line"><span class="attr">"local_address"</span>:<span class="string">"127.0.0.1"</span>,</span><br><span class="line"><span class="attr">"local_port"</span>:<span class="number">1080</span>,</span><br><span class="line"><span class="attr">"password"</span>:<span class="string">"123456"</span>,</span><br><span class="line"><span class="attr">"timeout"</span>:<span class="number">300</span>,</span><br><span class="line"><span class="attr">"method"</span>:<span class="string">"aes-256-cfb"</span>,</span><br><span class="line"><span class="attr">"fast_open"</span>:<span class="literal">false</span>,</span><br><span class="line"><span class="attr">"workers"</span>: <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>shadowsock-server.bat<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@echo off</span><br><span class="line">shadowsocks-libqss.exe -c config.json -S</span><br></pre></td></tr></table></figure></p>
+<p>将以上两个文件放到与shadowsocks-libqss.exe文件同目录，双击运行该bat脚本，即可在服务器上一键启动Shadowsocks了！</p>
+<h3 id="3-2-笔记本配置"><a href="#3-2-笔记本配置" class="headerlink" title="3.2 笔记本配置"></a>3.2 笔记本配置</h3><p>在我们的笔记本Shadowsocks客户端进行如下设置，即可连接到Shadowsocks服务器。<br><img src="/img/break-through-lan-segment-limit/add-socks5-server.png"></p>
+<p><img src="/img/break-through-lan-segment-limit/add-proxy-rules.png"></p>
+<h3 id="4-3-方案缺点"><a href="#4-3-方案缺点" class="headerlink" title="4.3 方案缺点"></a>4.3 方案缺点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">渗透中需要使用的工具，我们得一一为它们设置好代理，比较繁琐。</span><br><span class="line">有些工具，你为它设置代理后，依然不能用，比如nmap。</span><br></pre></td></tr></table></figure>
+<p>下个方案我们来解决这些问题。</p>
+<h2 id="方案四：VPN"><a href="#方案四：VPN" class="headerlink" title="方案四：VPN"></a>方案四：VPN</h2><p>以上方案，优点很明显，缺点也很明显。为了实现对目标站点的全端口渗透无疑最好的方案是将跳板服务器搭建成VPN服务器了，然后笔记本直接通过VPN来访问目标站点，其他无需设置。即可使得所有工具都能访问到目标站点服务器的所有端口。</p>
+<h3 id="5-1下载安装"><a href="#5-1下载安装" class="headerlink" title="5.1下载安装"></a>5.1下载安装</h3><p>去官网下载OpenVPN(我下载是openvpn-install-2.3.10-I601-x86_64.exe)，并在客户端和服务器按照以下同样的方式安装OpenVPN。安装过程没啥好说的，主要注意到以下这一步时，要选择红方框中的两个选项，不然安装完无法使用命令行制作证书。</p>
+<p><img src="/img/break-through-lan-segment-limit/install-setting.png"><br>安装完成后系统会多出一张网卡TAP-Windows Adapter V9。</p>
+<h3 id="5-2-系统设置"><a href="#5-2-系统设置" class="headerlink" title="5.2 系统设置"></a>5.2 系统设置</h3><p>设置跳板服务器用于访问目标站点的网卡共享给OpenVPN的虚拟网卡TAP-Windows Adapter V9，这步很重要！<br><img src="/img/break-through-lan-segment-limit/shared-network-card.png"><br>网上说需要修改注册表，测试发现不改也行，这里做个记录，说不定有的环境需要。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters</span><br><span class="line">将IPEnableRouter改为1</span><br></pre></td></tr></table></figure>
+<h3 id="5-3-生成VPN证书"><a href="#5-3-生成VPN证书" class="headerlink" title="5.3 生成VPN证书"></a>5.3 生成VPN证书</h3><p><1> 初始化配置</1></p>
+<pre><code>init-config
+</code></pre><p><2> 复制配置文件为批处理</2></p>
+<pre><code>vars
+</code></pre><p><3> 清除key文件夹内的文件,文件夹不存在会自动创建</3></p>
+<pre><code>clean-all
+</code></pre><p><4> 生成证书及key，需要填写一些参数，建议不要默认</4></p>
+<pre><code>build-ca
+</code></pre><p><5> 创建服务端证书及key，需要填写一些参数，建议不要默认，一路选y</5></p>
+<pre><code>build-key-server server
+</code></pre><p><6> 创建一个客户端证书及key，需要填写一些参数，建议不要默认,一路选y</6></p>
+<pre><code>build-key client
+</code></pre><p><7> 生成1024bit的key（pem文件），并结束此次创建</7></p>
+<pre><code>build-dh
+</code></pre><p>将新生成的keys目录下所有文件，全部拷贝到服务器OpenVPN的config目录下，<br>将keys目录下的client1.crt,client1.key和ca.crt复制到客户端的OpenVPN的config目录下。</p>
+<h3 id="5-4-编写服务端和客户端连接配置文件"><a href="#5-4-编写服务端和客户端连接配置文件" class="headerlink" title="5.4 编写服务端和客户端连接配置文件"></a>5.4 编写服务端和客户端连接配置文件</h3><p>在服务器上，在OpenVPN的sample-config目录下复制一个server.ovpn配置模板文件，到config目录。以下列举的为需要修改的配置项，其他可以使用默认配置。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># VPN服务器的地址</span><br><span class="line">local 192.168.149.140</span><br><span class="line"># 使用tcp协议</span><br><span class="line">proto tcp</span><br><span class="line"># 将目标站点所在的网段，写成路由推送给VPN客户端</span><br><span class="line">push &quot;route 10.0.3.0 255.255.255.0&quot;</span><br><span class="line"># 给VPN客户端推送的DNS（在内网一般不用写）</span><br><span class="line">push &quot;dhcp-option DNS 114.114.114.114&quot;</span><br><span class="line"># build-dh命令生成的是1024位的pem文件</span><br><span class="line">dh dh1024.pem</span><br></pre></td></tr></table></figure></p>
+<p>在客户端，在OpenVPN的sample-config目录下复制一个client.ovpn配置模板文件，到config目录。以下列举的为需要修改的配置项，其他可以使用默认配置。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 远程VPN服务器地址</span><br><span class="line">remote 192.168.149.140 1194</span><br><span class="line"># 使用TCP协议，与服务端相同</span><br><span class="line">proto tcp</span><br></pre></td></tr></table></figure></p>
+<p>最后先启动服务器端，右键托盘图标&gt;connect，小图标变绿色代表启动成功，若不成功可以查看下log日志，排查下原因。然后再启动客户端，操作一致。</p>
+<h3 id="5-5-方案缺点"><a href="#5-5-方案缺点" class="headerlink" title="5.5 方案缺点"></a>5.5 方案缺点</h3><p>配置相对比较繁琐。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这些方案我特意选择了比较简单易用的软件，并作了一个记录。方便自己某时需要，能快速突破限制，节省渗透时间。同时解决方案中推荐的软件在Linux上也有，搭建的方式类似。每个方案有优点也有缺点，大家要看自己在现场的实际需求来选择！</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><ul>
+<li><a href="https://www.librehat.com/three-minutes-to-set-up-shadowsocks-server-on-windows/" target="_blank" rel="noopener">Windows下三分钟搭建Shadowoscks服务器端</a></li>
+<li><a href="https://www.i5seo.com/shadowsocks-sock5-pac-vpn-difference-between.html
+" target="_blank" rel="noopener">Shadowsocks（Sock5代理）的PAC模式与全局模式与VPN的区别</a></li>
+<li><a href="http://www.fyluo.com/m/?post=198" target="_blank" rel="noopener">OpenVPN Windows 平台安装部署教程</a></li>
+<li><a href="https://www.landui.com/help/show-3871.html" target="_blank" rel="noopener">windows下利用OpenVPN搭建VPN服务器</a></li>
+<li><a href="https://www.cnblogs.com/lidabo/p/7027463.html" target="_blank" rel="noopener">OpenVPN 安装、配置客户端和服务端，以及OpenVPN的使用 (Windows 平台)</a></li>
+<li><a href="https://www.cnblogs.com/EasonJim/p/9657039.html" target="_blank" rel="noopener">OpenVPN搭建中tap与tun的实际使用区别</a></li>
+<li><a href="http://blog.shell909090.org/blog/archives/2724/" target="_blank" rel="noopener">openvpn的几种基本模式</a></li>
+<li><a href="https://www.ilanni.com/?p=9847" target="_blank" rel="noopener">烂泥：openvpn配置文件详解</a></li>
+<li><a href="https://www.ilanni.com/?p=9877" target="_blank" rel="noopener">烂泥：openvpn tun模式下客户端与内网机器通信</a></li>
+</ul>
+<p>https://www.ilanni.com/?p=9847<br>https://www.ilanni.com/?p=9877</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-08-26T17:43:31.491Z" itemprop="dateUpdated">2019-08-27 01:43:31</time>
+</span><br>
+
+
+        
+        转载注明来自<a href="/2019/08/27/break-through-lan-segment-limit/" target="_blank" rel="external">https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://j2ekim.github.io">
+            <img src="/img/Avatar.jpg" alt="J2ekim">
+            J2ekim
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/渗透测试/">渗透测试</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/&title=《突破内网渗透中的访问策略限制》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/&title=《突破内网渗透中的访问策略限制》 — j2ekim's Blog&source=在内网做渗透测试时，常常遇到访问策略限制，无法直接访问渗透目标。本文算是记录下我上一年的几个解决方案。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《突破内网渗透中的访问策略限制》 — j2ekim's Blog&url=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/07/11/域渗透/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">JBoss引起的内网渗透</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>J2ekim &copy; 2017 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/&title=《突破内网渗透中的访问策略限制》 — j2ekim's Blog&pic=https://j2ekim.github.io/img/Avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/&title=《突破内网渗透中的访问策略限制》 — j2ekim's Blog&source=在内网做渗透测试时，常常遇到访问策略限制，无法直接访问渗透目标。本文算是记录下我上一年的几个解决方案。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《突破内网渗透中的访问策略限制》 — j2ekim's Blog&url=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/&via=https://j2ekim.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://j2ekim.github.io/2019/08/27/break-through-lan-segment-limit/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACq0lEQVR42u3awW4qMQwF0P7/T7+3rYQ63GsniMWZFRrKkJNKsbH98xNf/16u57/5fef1dfJu/r0HLjw8PLz10vOFtot+Zjzff339vGY8PDy827z80c/BIF/WLPDU24SHh4f3Nbw8kLTbsU/B8fDw8L6H197Jn5YECTw8PLxv4yUH/XPiu8cn33ux1oKHh4cX8/Iu0ve8vtLfw8PDw1t31WeHcn5MPxc4DqwWDw8P7wLv1OjAqWGsHJwXPvDw8PBu8JKCwuzIbrejLVW0o114eHh4e97m2M1LtPnGJYyiaIuHh4d3jdfWQtt2V77c2cDWn+/i4eHhXePlowBJyWD2nDbMRJ/Cw8PDu8abJdzDwzo4+o8NLuDh4eFd4LWM/aKTcYRZbeFNZRoPDw/vKC8fIMgHp/KEe5Ne1509PDw8vKO8ffN+tkF5EXm/HXh4eHhnee0YQdL0agPPbGQh+ifh4eHhHeUlH2iT42SwYFauzQsceHh4eDd4bYE1OdbbMkf7/OFMGR4eHt5RXlu0bUn5nVmx+M9n4uHh4V3jJY2rNuVtE/S88JGsCg8PD+8er23/5xuRFzLyYDPcSjw8PLyjvNmP/5y6fzdP+utiBB4eHt6I1/74z5tSs9baviGHh4eH9xnerEh6qnCwCTn1AAEeHh7eUd6mGZYf5fmWHYt4eHh4eNd4+wT37BGfPD9J6/Hw8PDu8TYF09l4QVEd2Vx4eHh4H4Rtig5tCXiWfL95Ph4eHt4F3uyM3bevboSfVZjBw8PDK3lJMGgHsJLP5iMIbWDAw8PD+wwvT2dzQB6LNiWJNxuEh4eH9wW8WXOrHQhIAMP+Hh4eHt7HeRtMstA8pY4CDx4eHt41XluMmKXLyfM3weNYGRcPDw+vW09dLLhRAs7Tdzw8PLwP8v4DF954lRTL5VoAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
